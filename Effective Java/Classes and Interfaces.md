@@ -299,7 +299,5 @@ public class StaticInitializationBlock {
 
 
 
-# 아이템 18. 상속보다는 컴포지션을 사용하라
-
 ## 아이템 18. 상속보다는 컴포지션을 사용하라
 
