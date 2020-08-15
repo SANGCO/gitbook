@@ -1,5 +1,216 @@
 
 
+## 아이템 15. 클래스와 멤버의 접근 권한을 최소화하라
+
+
+
+> To summarize, you should reduce accessibility of program elements as much as possible (within reason). After carefully designing a minimal public API, you should prevent any stray classes, interfaces, or members from becoming part of the API. With the exception of public static final fields, which serve as constants, public classes should have no public fields. Ensure that objects referenced by public static final fields are immutable.
+
+> 프로그램 요소의 접근성은 가능한 한 최소한으로 하라. 꼭 필요한 것만 골라 최소한의 public API를 설계하자. 그 외에는 클래스, 인터페이스, 멤버가 의도치 않게 API로 공개되는 일이 없도록 해야 한다. public 클래스는 상수용 public static final 필드 외에는 어떠한 public 필드도 가져서는 안 된다. public static final 필드가 참조하는 객체가 불변인지 확인하라.
+
+
+
+### 잘 설계된 컴포넌트
+
+- 어설프게 설계된 컴포넌트와 잘 설계된 컴포넌트의 가장 큰 차이
+  - 클래스 내부 데이터와 내부 구현 정보를 외부 컴포넌트로부터 얼마나 잘 숨겼느냐.
+  - 잘 설계된 컴포넌트는 모든 내부 구현을 완벽히 숨겨, 구현과 API를 깔끔히 분리한다.
+
+
+
+### 정보 은닉의 장점
+
+* 시스템 개발 속도를 높인다.
+  * 여러 컴포넌트를 병렬로 개발할 수 있기 때문
+  * 의존하는 모듈의 인터페이스(API)만 알면 된다.)
+  
+* 시스템 관리 비용을 낮춘다.
+  * 각 컴포넌트가 의존관계가 얕으니 더 빨리 파악 할 수 있다.
+  * 서로가 API로만 소통하니 구현체를 바꾸기 용이하다.
+
+
+* 정보 은닉 자체가 성능을 높여주지는 않지만, 성능 최적화에 도움을 준다.
+  * 다른 컴포넌트에 영향을 주지 않고 원하는 컴포넌트만 최적화 할 수 있다.
+    * A 컴포넌트를 수정해도 B 컴포넌트가 영향을 받지 않는다.
+
+* 소프트웨어 재사용성을 높인다.
+  * 외부에 거의 의존하지 않고 독자적으로 동작할 수 있는 컴포넌트라면 낮선 환경에서도 재사용 용이
+
+* 큰 시스템을 제작하는 난이도를 낮춰준다.
+  * 전체가 완성되지 않아도 개별 컴포넌트의 동작을 검증 할 수 있다.
+
+
+
+### 접근성을 가능한 좁히기
+
+- **접근 제한자를 제대로 활용하는 것이 정보 은닉의 핵심**
+
+  - 기본 원칙은 모든 클래스와 멤버의 접근성을 **가능한 한 좁혀야** 한다는 것이다.
+
+
+
+- 톱레벨 클래스(일반 클래스)와 인터페이스에 부여 할 수 있는 접근 수준은 `package-private`, `public` 두 가지다.
+  - 보통 `package-private`을 `default` 라고 불렀었다.
+    - `private`인데 같은 패키지 안에서만 쓸 수 있다고 이름이 `package-private`인가 보다.
+  - `public`으로 선언하면 공개 API가 되고 `default`로 선언하면 패키지 안에서만 사용할 수 있다.
+  - **그냥 습관적으로 접근 수준을 `public`으로 주지말고 패키지 외부에서 쓸 이유가 없다면 `package-private`로 선언하자.** 
+    - 한 클래스에서만 사용하는 클래스나 인터페이스가 있다면 그 사용하는 클래스 안에 `private static class`로 중첩시켜보자.
+  - **`public` 일 필요가 없는 클래스의 접근 수준을` package-private` 톱레벨 클래스로 좁히자.** 
+    - `package-private` 톱 레벨 클래스는 내부 구현에 속하기 때문에 API가 공개되고 난 뒤에도 내부 구현을 언제든지 수정할 수 있다. 
+    - jar 안에 `java.util.ArrayPrefixHelpers` class의 경우 접근 수준이 `package-private`
+
+
+
+- 클래스의 공개 API는 모든 멤버 변수 우선 `private`으로 묶고 같은 패키지의 다른 클래스가 접근해야 하는 멤버에 한하여 `private` 제한자를` package-private`으로 풀어주자. 
+  - 이런 작업이 잦다면 시스템에서 컴포넌트를 더 분해해야 하는 것은 아닌지 다시 고민해보자. 
+  - `Serializable`을 구현한 클래스에서는 그 필드들도 의도치 않게 공개 API가 될 수도 있다(아이템 86, 87).
+  
+  - `public` 클래스에서 멤버의 접근 수준을 `package-private`에서` protected`로 변경하는 순간 그 멤버에 접근할 수 있는 대상 범위가 엄청나게 넓어진다. 
+    - **`public` 클래스의 `protected` 멤버는 공개 API이므로 영원히 지원돼야 한다. 그러니 `protected` 멤버의 수는 적을수록 좋다.**
+
+
+
+- 상위 클래스의 메서드를 재정의할 때는 그 접근 수준을 상위 클래스에서보다 좁게 설정 할 수 없다. 
+  - 이 제약은 상위 클래스의 인스턴스는 하위 클래스의 인스턴스로 대체해 사용할 수 있어야 한다는 규칙(**리스코프 치환 원칙**, 아이템 10)을 지키기 위해 필요하다.
+  - 클래스가 인터페이스를 구현하는 건 이 규칙의 특별한 예로 볼 수 있고, 이때 클래스는 인터페이스가 정의한 모든 메서드를 `public`으로 선언해야 한다.
+
+
+
+- 테스트를 위해서 클래스의 `private` 멤버를 `package-private`까지 풀어주는 것은 허용할 수 있지만, 그 이상은 안된다.
+
+
+
+- `public` 클래스의 인스턴스 필드는 되도록 `public`이 아니어야 한다(아이템 16).
+  - 필드가 가변 객체를 참조하거나, `final`이 아닌 인스턴스 필드를 `public`으로 선언하면 그 필드와 관련된 모든 것은 불변식을 보장할 수 없게 된다. 
+    - 필드가 수정될 때 (락 획득 같은) 다른 작업을 할 수 없게 되므로 `public` 가변 필드를 갖는 클래스는 일반적으로 스레드 안전하지 않다.
+      - 이 부분은 다시 체크
+  - 필드가 `final`이면서 불변 객체를 참조하더라도 문제는 여전히 남는데 내부 구현을 바꾸고 싶어도 그 `public` 필드를 없애는 방식으로는 리펙터링할 수 없게 된다.
+    - 불변식은 보장이 되겠지만 필드가 공개가 되어버리니 향후에 제거 할 수가 없다.
+    - 이러한 문제는 정적 필드에서도 마찬가지이나 예외가 하나 있는데 꼭 필요한 경우의 상수는 `public static final` 필드로 공개해도 좋다.
+      - 이런 필드는 반드시 **기본 타입**이나 **불변 객체**를 참조해야 한다(아이템 17).
+
+
+
+- 길이가 0이 아닌 배열은 모두 변경 가능하니 주의하자. 
+  - 테스트 코드를 만들어서 실습해 보니 final이지만 변경이 되는군.
+  - 따라서 클래스에서 `public static final` 배열 필드를 두거나 이 필드를 반환하는 접근자 메서드를 제공해서는 안된다. 
+  - 해결책은 두가지다.
+    -  public 배열을 private으로 만들고 public 불변 리스트를 추가
+    -  배열을 private으로 만들고 그 복사본을 반환하는 public 메서드를 추가하는 방법(방어적 복사).
+  - 어느 반환 타입이 더 쓰기 편할지, 성능은 어느 쪽이 나을지를 고민해 정하자.
+
+```java
+// 배열을 private
+private static final Thing[] PRIVATE_VALUES = { ... };
+// public 불변 리스트
+public static final List<Thing> VALUES = Collections.unmodifiableList(Arrays.asList(PRIVATE_VALUE));
+```
+
+```java
+// 배열은 private
+private static final Thing[] PRIVATE_VALUES = { ... };
+public static final Thing[] values(){
+		// 복사본을 반환
+  	return PRIVATE_VALUES.clone();
+}
+```
+
+
+
+### 암묵적 접근 수준 두 가지
+
+- 패키지가 클래스들의 묶음이듯, 모듈은 패키지들의 묶음이다.
+
+- 자바 9에서는 모듈 시스템이라는 개념이 도입되면서 두 가지 암묵적 접근 수준이 추가되었다.
+  - 모듈은 자신에 속하는 패키지 중 공개(export)할 것들을 선언한다.
+    - `protected` 혹은 `public` 멤버라도 해당 패키지를 공개하지 않았다면 모듈 외부에서는 접근할 수 없다.
+  - 모듈 시스템을 활용하면 클래스를 외부에 공개하지 않으면서도 같은 모듈을 이루는 패키지 사이에서는 자유롭게 공유할 수 있다.
+- 이 암묵적 접근 수준들은 각각 public 수준과 protected 수준과 같으나 **그 효과가 모듈 내부로 한정**되는 변종인 것이다.
+- 모듈의 JAR 파일을 자신의 모듈 경로가 아닌 애플리케이션의 클래스패스(classpath)에 두면 그 모듈 안의 모든 패키지는 마치 모듈이 없는 것 처럼 행동한다.
+- 새로 등장한 이 접근 수준을 적극 활용한 대표적인 예가 바로 JDK 자체다.
+  - 자바 라이브러리에서 공개하지 않은 패키지들은 해당 모듈 밖에서는 절대 접근할 수 없다.
+
+
+
+## 아이템 16. public 클래스 안에는 public 필드를 두지 말고 접근자 메서드를 사용하라
+
+
+
+> In summary, public classes should never expose mutable fields. It is less harmful, though still questionable, for public classes to expose immutable fields. It is, however, sometimes desirable for package-private or private nested classes to expose fields, whether mutable or immutable.
+
+> public 클래스는 절대 가변 필드를 직접 노출해서는 안 된다. 불변 필드라면 노출해도 덜 위험하지만 완전히 안심할 수는 없다. 하지만 package-private 클래스나 private 중첩 클래스에서는 종종 (불변이든 가변이든) 필드를 노출하는 편이 나을 때도 있다.
+
+
+
+- 코드 16-1 예제에 클래스는 데이터 필드에 직접 접근할 수 있으니 캡슐화의 이점을 제공하지 못한다(아이템 15).
+  - API를 수정하지 않고는 내부 표현을 바꿀 수 없다.
+    - 벌써 공개 되었으니껜
+  - 불변식을 보장할 수 없다.
+  - 외부에서 필드에 접근할 때 부수 작업을 수행할 수 없다.
+    - Setter에 뭔가 작업을 해두는걸 말하는 듯.
+  - 필드를 모두 `private`으로 바꾸고 `public` 접근자(getter)를 추가한다.
+
+```java
+// 코드 16-1 이처럼 퇴보한 클래스는 public이어서는 안 된다!
+class Point {
+
+  public double x;
+  public double y;
+  
+}
+```
+
+
+
+- 패키지 바깥에서 접근할 수 있는 클래스라면 접근자를 제공함으로써 클래스 내부 표현 방식을 언제든 바꿀 수 있는 유연성을 얻을 수 있다.
+  - `public` 클래스가 필드를 공개하면 이를 사용하는 클라이언트가 생겨날 것이므로 내부 표현 방식을 마음대로 바꿀 수 없게된다.
+  - 이미 제공한 접근자만 유지를 해주면 내부 표현 방식을 언제든지 바꿀 수 있다 이런 뜻인듯. 
+
+```java
+// 코드 16-2 접근자와 변경자(mutator) 메서드를 활용해 데이터를 캡슐화한다.
+class Point {
+  
+  private double x;
+  private double y;
+  
+  public Point(double x, double y){
+    this.x = x;
+    this.y = y;
+  }
+  
+  public double getX() { return x; }
+  public double getY() { return y; }
+  
+  public void setX( double x ) { this.x = x; }
+  public void setX( double y ) { this.y = y; }
+  
+}
+```
+
+
+
+- `package-private` 클래스 혹은 `private` 중첩 클래스라면 데이터 필드를 노출한다 해도 하등의 문제가 없다.
+  - 클라이언트 코드가 이 클래스 내부 표현에 묶이기는 하나, 클라이언트도 어차피 이 클래스를 포함하는 패키지 안에서만 동작하는 코드일 뿐이다. 따라서 패키지 바깥 코드는 전혀 손대지 않고도 데이터 표현 방식을 바꿀 수 있다.
+    - 여기서 말하는 클라이언트는 `package-private` 클래스 혹은 `private` 중첩 클래스를 사용하는 쪽을 얘기하는거 같다.
+      - `package-private` 클래스 혹은 `private` 중첩 클래스에 접근할 수 있다는 것은 같은 패키지 혹은 같은 클래스에 있다는 거임.
+      - 공개 API와는 상관이 없겠지?
+
+
+
+- 자바 플랫폼 라이브러리에도 `public` 클래스의 필드를 직접 노출하지 말라는 규칙을 어기는 사례가 종종 있다.
+  - 대표적인 예가 `java.awt.package` 패키지의 `Point`와 `Dimension` 클래스
+    - 내부를 노출한 `Dimension` 클래스의 심각한 성능 문제는 오늘날까지도 해결되지 못했다.
+    - 이 클래스들을 흉내 내지 말고, 타산지석으로 삼길 바란다.
+
+
+
+- `public` 클래스의 필드가 불변이라면 직접 노출할 때의 단점이 조금은 줄어 들지만, 여전히 결코 좋은 생각이 아니다.
+  - API를 변경하지 않고는 표현 방식을 바꿀 수 없고, 필드를 읽을 때 부수 작업을 수행할 수 없다는 단점은 여전하다. 
+
+
+
+
+
 ## 아이템 17. 변경 가능성을 최소화하라
 
 - **불변 클래스**란 간단히 말해 그 인스턴스의 내부 값을 수정할 수 없는 클래스다.
