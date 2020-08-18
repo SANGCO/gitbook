@@ -2,8 +2,6 @@
 
 ## 아이템 15. 클래스와 멤버의 접근 권한을 최소화하라
 
-
-
 > To summarize, you should reduce accessibility of program elements as much as possible (within reason). After carefully designing a minimal public API, you should prevent any stray classes, interfaces, or members from becoming part of the API. With the exception of public static final fields, which serve as constants, public classes should have no public fields. Ensure that objects referenced by public static final fields are immutable.
 
 > 프로그램 요소의 접근성은 가능한 한 최소한으로 하라. 꼭 필요한 것만 골라 최소한의 public API를 설계하자. 그 외에는 클래스, 인터페이스, 멤버가 의도치 않게 API로 공개되는 일이 없도록 해야 한다. public 클래스는 상수용 public static final 필드 외에는 어떠한 public 필드도 가져서는 안 된다. public static final 필드가 참조하는 객체가 불변인지 확인하라.
@@ -50,6 +48,7 @@
 
 
 - 톱레벨 클래스(일반 클래스)와 인터페이스에 부여 할 수 있는 접근 수준은 `package-private`, `public` 두 가지다.
+  - 톱레벨? 클래스 안에있는 클래스들을 생각해보면 여기서 말하는 톱레벨 클래스의 의미를 알 수 있다.
   - 보통 `package-private`을 `default` 라고 불렀었다.
     - `private`인데 같은 패키지 안에서만 쓸 수 있다고 이름이 `package-private`인가 보다.
   - `public`으로 선언하면 공개 API가 되고 `default`로 선언하면 패키지 안에서만 사용할 수 있다.
@@ -133,8 +132,6 @@ public static final Thing[] values(){
 
 
 ## 아이템 16. public 클래스 안에는 public 필드를 두지 말고 접근자 메서드를 사용하라
-
-
 
 > In summary, public classes should never expose mutable fields. It is less harmful, though still questionable, for public classes to expose immutable fields. It is, however, sometimes desirable for package-private or private nested classes to expose fields, whether mutable or immutable.
 
@@ -509,4 +506,97 @@ public class StaticInitializationBlock {
 
 
 ## 아이템 18. 상속보다는 컴포지션을 사용하라
+
+> To summarize, inheritance is powerful, but it is problematic because it violates encapsulation. It is appropriate only when a genuine subtype relationship exists between the subclass and the superclass. Even then, inheritance may lead to fragility if the subclass is in a different package from the superclass and the superclass is not designed for inheritance. To avoid this fragility, use composition and forwarding instead of inheritance, especially if an appropriate interface to implement a wrapper class exists. Not only are wrapper classes more robust than subclasses, they are also more powerful.
+
+> 상속은 강력하지만 캡슐화를 해친다는 문제가 있다. 상속은 상위 클래스와 하위 클래스가 순수한 is-a 관계일 때만 써야 한다. is-a 관계일 때도 안심할 수만은 없는 게, 하위 클래스의 패키지가 상위 클래스와 다르고, 상위 클래스가 확장을 고려해 설계되지 않았다면 여전히 문제가 될 수 있다. 상속의 취약점을 피하려면 상속 대신 컴포지션과 전달을 사용하자. 특히 래퍼 클래스로 구현할 적당한 인터페이스가 있다면 더욱 그렇다. 래퍼 클래스는 하위클래스보다 견고하고 강력하다.
+
+
+
+- 상속은 코드를 재사용하는 강력한 수단이지만, 항상 최선은 아니다.
+  - 상위 클래스와 하위 클래스를 모두 같은 프로그래머가 통제하는 패키지 안에서라면 상속도 안전한 방법이다.
+  - 확장할 목적으로 설계되었고 문서화도 잘 된 클래스(아이템 19)도 마찬가지로 안전하다.
+  - **다른 패키지의 구체 클래스를 상속하는 일은 위험하다.**
+    - 이번 아이템의 '상속'은 **클래스가 다른 클래스를 확장하는 구현 상속**을 말한다.
+      - 클래스가 인터페이스를 구현하거나 인터페이스가 다른 인터페이스를 확장하는 **인터페이스 상속**과는 무관하다.
+
+
+
+- 메서드 호출과 달리 상속은 캡슐화를 깨뜨린다.
+  - 상위 클래스가 어떻게 구현되느냐에 따라 하위 클래스의 동작에 이상이 생길 수 있다.
+  - 여기서 말하는 메서드 호출의 의미는 뒤에 나온다.
+    - composition, forwarding, forwarding method
+
+
+
+- 상속이 캡슐화를 깨뜨리는 구체적인 예
+  - 성능을 높이려고 `HashSet`은 처음 생성된 이후 원소가 몇 개 더해졌는지 알 수 있게 만들려고 한다.
+    - `HashSet`의 현재 크리와는 다른 개념
+
+```java
+// 코드 18-1 잘못된 예 - 상속을 잘못 사용했다! (114쪽)
+public class InstrumentedHashSet<E> extends HashSet<E> {
+    
+  	// 추가된 원소의 수
+    private int addCount = 0;
+
+    public InstrumentedHashSet() {
+    }
+
+    public InstrumentedHashSet(int initCap, float loadFactor) {
+        super(initCap, loadFactor);
+    }
+
+    @Override public boolean add(E e) {
+        addCount++;
+        return super.add(e);
+    }
+
+    @Override public boolean addAll(Collection<? extends E> c) {
+        addCount += c.size();
+        return super.addAll(c);
+    }
+
+    public int getAddCount() {
+        return addCount;
+    }
+
+    public static void main(String[] args) {
+        InstrumentedHashSet<String> s = new InstrumentedHashSet<>();
+        s.addAll(List.of("틱", "탁탁", "펑"));
+        System.out.println(s.getAddCount());
+    }
+  
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
