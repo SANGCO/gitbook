@@ -983,6 +983,3 @@ static Comparator<Object> hashCodeOrder = new Comparator<>() {
 static Comparator<Object> hashCodeOrder = 
   	Comparator.comparingInt(o -> o.hashCode());
 ```
-
-
-
