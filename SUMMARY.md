@@ -5,7 +5,6 @@
     * [객체 생성과 파괴](Effective Java/Creating and Destroying Objects.md)
     * [모든 객체의 공통 메서드](Effective Java/Methods Common to All Objects.md)
     * [클래스와 인터페이스](Effective Java/Classes and Interfaces.md)
-    * 테스트
     * [제네릭](Effective Java/Generics.md)
     * [열거 타입과 애너테이션](Effective Java/Enums and Annotations.md)
     * [람다와 스트림](Effective Java/Lambdas and Streams.md)
