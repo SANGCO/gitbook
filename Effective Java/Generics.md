@@ -12,22 +12,22 @@
 
 - 아따 많다. 타입 파라미터와 타입들을 분류해보자.
 
-| 한글 용어                    | 영문                           | 예                                |
-| :--------------------------- | ------------------------------ | --------------------------------- |
-| 실제 타입 파리미터(매개변수) | actual type parameter          | <String>                          |
-| (정규) 타입 파라미터         | formal type parameter          | <E>                               |
-| 한정적 타입 파라미터         | bounded type parameter         | <E extends Number>                |
-| 재귀적 타입 한정             | recursive type bound           | <T extends Comparable<T>>         |
-| 이거는 부르는 이름이 없나?   | recursive wildcard type bound? | <T extends Comparable<? super T>> |
-|                              |                                |                                   |
-| 로 타입                      | raw type                       | List                              |
-| 매개변수화 타입              | parameterized type             | List<String>                      |
-| 제네릭 타입                  | generic type                   | List<E>                           |
-| 비한정적 와일드카드 타입     | unbounded wildcard type        | List<?>                           |
-| 한정적 와일드카드 타입       | bounded wildcard type          | List<? extends Number>            |
-|                              |                                |                                   |
-| 제네릭 메서드                | generic method                 | static <E> List<E> asList(E[] a)  |
-| 타입 토큰                    | type token                     | String.class                      |
+| 한글 용어                    | 영문                           | 예                                  |
+| :--------------------------- | ------------------------------ | ----------------------------------- |
+| 실제 타입 파리미터(매개변수) | actual type parameter          | `<String>`                          |
+| (정규) 타입 파라미터         | formal type parameter          | `<E>`                               |
+| 한정적 타입 파라미터         | bounded type parameter         | `<E extends Number>`                |
+| 재귀적 타입 한정             | recursive type bound           | `<T extends Comparable<T>>`         |
+| 이거는 부르는 이름이 없나?   | recursive wildcard type bound? | `<T extends Comparable<? super T>>` |
+|                              |                                |                                     |
+| 로 타입                      | raw type                       | `List`                              |
+| 매개변수화 타입              | parameterized type             | `List<String>`                      |
+| 제네릭 타입                  | generic type                   | `List<E>`                           |
+| 비한정적 와일드카드 타입     | unbounded wildcard type        | `List<?>`                           |
+| 한정적 와일드카드 타입       | bounded wildcard type          | `List<? extends Number>`            |
+|                              |                                |                                     |
+| 제네릭 메서드                | generic method                 | `static <E> List<E> asList(E[] a)`  |
+| 타입 토큰                    | type token                     | `String.class`                      |
 
 
 
