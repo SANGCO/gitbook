@@ -714,8 +714,6 @@ private static FieldType getField() {
 }
 ```
 
-- 클래스가 생성 되었을 때 field 변수에 값이 들어올까 아니면 computeFieldValue() 메서드만 걸릴까? 실험
-
 
 
 

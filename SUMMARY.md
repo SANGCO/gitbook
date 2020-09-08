@@ -20,16 +20,20 @@
     * [오브젝트와 의존관계](Tobis Spring 3.1/Objects and Dependencies.md)
     
 - 자바 웹 프로그래밍 Next Step
+  - [두 번째 양파 껍질 벗기기 파트 1](Next Step/Peel the onion part 1.md)
+  - [두 번째 양파 껍질 벗기기 파트 2](Next Step/Peel the onion part 2.md)
 - 자바와 JUnit을 활용한 실용주의 단위 테스트
+  
+  - 
+
+- 백명석님 클린 코더스
   - 
 - 자바 기반의 마이크로서비스 이해와 아키텍처 구축하기
   - 
 - 모두의 네트워크
   - 
-
 - 그림으로 공부하는 IT 인프라 구조
   - 
-
 - 자바 8 인 액션
 - 자바 ORM 표준 JPA 프로그래밍
   - 영속성 관리
