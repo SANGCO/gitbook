@@ -41,6 +41,8 @@
   - 웹 애플리케이션과 영속성 관리
   - 컬렉션과 부가 기능
   - 고급 주제와 성능 최적화
+- 스피드 직독직해
+  - [스피드 직독직해](Speed Reading and Direct Comprehension/summary.md)
 
 
 
