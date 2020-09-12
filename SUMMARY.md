@@ -31,7 +31,7 @@
   - 영속성 관리
 - [자바와 JUnit을 활용한 실용주의 단위 테스트](Pragmatism unit test/Pragmatism unit test.md)
 
-- [백명석님 클린](Clean Coders/Clean Coders.md)
+- [백명석님 클린 코더스](Clean Coders/Clean Coders.md)
 - [모두의 네트워크](Everyones network/Everyones network.md)
 - 그림으로 공부하는 IT 인프라 구조
 - [자바 8 인 액션](Java 8 in action/Java 8 in action.md)
