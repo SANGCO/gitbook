@@ -16,9 +16,9 @@
 * 토비의 스프링 3.1 Vol. 1
   
     * [오브젝트와 의존관계](Tobis Spring 3.1/Objects and Dependencies.md)
-    * [테스트](Toby's Spring 3.1 Vol. 1/Test.md)
-    * [템플릿](Toby's Spring 3.1 Vol. 1/Template.md)
-    * [예외](Toby's Spring 3.1 Vol. 1/Exception.md)
+    * [테스트](Tobys Spring 3.1 Vol. 1/Test.md)
+    * [템플릿](Tobys Spring 3.1 Vol. 1/Template.md)
+    * [예외](Tobys Spring 3.1 Vol. 1/Exception.md)
     * 서비스 추상화
     * AOP
     * 스프링 핵심 기술의 응용
@@ -26,9 +26,9 @@
     * 스프링 프로젝트 시작하기
     
 * 토비의 스프링 3.1 Vol. 2
-    * [IoC 컨테이너와 DI](Toby's Spring 3.1 Vol. 2/IoC container and DI.md)
+    * [IoC 컨테이너와 DI](Tobys Spring 3.1 Vol. 2/IoC container and DI.md)
     * 데이터 액세스 기술
-    * [스프링 웹 기술과 스프링 MVC](Toby's Spring 3.1 Vol. 2/Spring Web and Spring MVC.md)
+    * [스프링 웹 기술과 스프링 MVC](Tobys Spring 3.1 Vol. 2/Spring Web and Spring MVC.md)
     * 스프링 @MVC
     * AOP와 LTW
     * 테스트 컨텍스트 프레임워크
