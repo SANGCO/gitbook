@@ -229,6 +229,7 @@ assertThat(ac.getBeanFactory().getBeanDefinitionCount(), is(2)); // 빈 설정 �
     - 웹 애플리케이션의 시작과 종료 시 발생하는 이벤트를 처리하는 리스너
   - `ContextLoaderListener`
     - 웹 애플리케이션이 시작할 때 자동으로 루트 애플리케이션 컨텍스트를 만들고 초기화해준다.
+      - 자동으로 만들어진 루트 애플리케이션 컨텍스트는 서블릿 컨텍스트에 등록된다.
     - 별다른 파라미터를 지정하지 않으면, 디폴트로 설정된 다음의 값이 적용된다.
       - 애플리케이션 컨텍스트 클래스
         - `XmlWebApplicationContext`
