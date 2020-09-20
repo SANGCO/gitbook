@@ -25,19 +25,6 @@
 * 자바 웹 프로그래밍 Next Step
     - [두 번째 양파 껍질 벗기기 파트 1](Next Step/Peel the onion part 1.md)
     - [두 번째 양파 껍질 벗기기 파트 2](Next Step/Peel the onion part 2.md)
-* Effective Java
-* [객체 생성과 파괴](Effective Java/Creating and Destroying Objects.md)
-    * [모든 객체의 공통 메서드](Effective Java/Methods Common to All Objects.md)
-    * [클래스와 인터페이스](Effective Java/Classes and Interfaces.md)
-    * [제네릭](Effective Java/Generics.md)
-    * [열거 타입과 애너테이션](Effective Java/Enums and Annotations.md)
-    * [람다와 스트림](Effective Java/Lambdas and Streams.md)
-    * [메서드](Effective Java/Methods.md)
-    * [일반적인 프로그래밍 원칙](Effective Java/General Programming.md)
-    
-* [예외](Effective Java/Exceptions.md)
-    * [동시성](Effective Java/Concurrency.md)
-    * [직렬화](Effective Java/Serialization.md)
 - 자바 ORM 표준 JPA 프로그래밍
   - 영속성 관리
 - [자바와 JUnit을 활용한 실용주의 단위 테스트](Pragmatism unit test/Pragmatism unit test.md)
