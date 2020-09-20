@@ -214,7 +214,8 @@ public class StringCalculator {
 
 ### 4.2 HTTP 웹 서버 구현
 
-https://github.com/slipp/web-application-server
+- 실습
+  - https://github.com/slipp/web-application-server
 
 
 
@@ -285,21 +286,44 @@ https://github.com/slipp/web-application-server
 
 
 
-
-
 ## 6장 서블릿/JSP를 활용해 동적인 웹 애플리케이션 개발하기
+
+
 
 ### 6.1 서블릿/JSP로 회원관리 기능 다시 개발하기
 
+- JSP
+  - Java Server Page
+  - 서블릿의 한계를 극복하기 위해 등장
+  - 정적인 HTML은 그대로 두고 동적으로 변경되는 부분만 JSP 구문을 활용해 프로그래밍으로 구현
+    - 스크립틀릿이라고 하는 `<% %>` 내에 자바 구문을 그대로 사용할 수 있다.
+      - 많은 로직이 JSP에 자바 코드로 구현되면 JSP 유지보수가 힘들어 진다.
+      - JSTL과 EL을 활용하면 JSP에서 자바 구문을 완전히 제거할 수 있다.
+
+- 실습
+  - https://github.com/slipp/jwp-basic
+
+
+
 ### 6.2 세션(HttpSession) 요구사항 및 실습
+
+
 
 ### 6.3 세션(HttpSession) 구현
 
+
+
 ### 6.4 MVC 프레임워크 요구사항 1단계
+
+
 
 ### 6.5 MVC 프레임워크 구현 1단계
 
+
+
 ### 6.6 쉘 스크립트를 활용한 배포 자동화
+
+
 
 ### 6.7 추가 학습 자료
 
@@ -320,12 +344,6 @@ https://github.com/slipp/web-application-server
 
 
 ## 7장 DB를 활용해 데이터를 영구적으로 저장하기
-
-6장 ~ 12장 실습에서 사용할 저장소 Fork해서 진행하기
-
-aws 하나 파고 배포 자동화 세팅하고 하자
-
-실습 브랜치 주소
 
 
 

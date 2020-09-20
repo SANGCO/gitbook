@@ -1,9 +1,5 @@
 
 
-## 1장 오브젝트와 의존관계
-
-
-
 ## 1.1 초난감 DAO
 
 
@@ -85,11 +81,12 @@ public class UserDao {
 
 #### UserDao의 관심사항
 
-- DB와 연결을 위한 커넥션을 어떻게 가져올까
-  - 현재 모든 메서드에 DB 커넥션을 가지고 오는 코드가 있다.
-    - DB 커넥션 관련 변경이 일어나면 골때린다. 
-- 사용자 등록을 위해 DB에 보낼 SQL 문장을 담을 Statement를 만들고 실행하는 것
-- 작업이 끝나면 사용한 리소스인 Statement와 Connection 오브젝트를 닫아줘서 소중한 공유 리소를 시스템에 돌려주는 것
+- UserDao의 관심사항
+  - DB와 연결을 위한 커넥션을 어떻게 가져올까
+    - 현재 모든 메서드에 DB 커넥션을 가지고 오는 코드가 있다.
+      - DB 커넥션 관련 변경이 일어나면 골때린다. 
+  - 사용자 등록을 위해 DB에 보낼 SQL 문장을 담을 Statement를 만들고 실행하는 것
+  - 작업이 끝나면 사용한 리소스인 Statement와 Connection 오브젝트를 닫아줘서 소중한 공유 리소를 시스템에 돌려주는 것
 
 
 
@@ -378,11 +375,11 @@ public class DaoFactory {
         return new UserDao(connectionMaker());
     }
   
-    public UserDao userDao() {
+    public UserDao accountDao() {
         return new AccountDao(connectionMaker());
     }
   
-    public UserDao userDao() {
+    public UserDao messageDao() {
         return new MessageDao(connectionMaker());
     }
 
@@ -477,7 +474,7 @@ public class UserDaoTest {
 - 빈(bean)
   - 빈 또는 빈 오브젝트는 스프링이 IoC 방식으로 관리하는 오브젝트라는 뜻
   - 스프링을 사용하는 애플리케이션에서 만들어지는 모든 오브젝트가 다 빈은 아니다.
-  - 스프링이 직접 그 생성과 제어를 담당하는 오브젝트만을 빈이라고 부른다.
+  - 스프링이 직접 그 **생성과 제어를 담당**하는 오브젝트만을 빈이라고 부른다.
 - 빈 팩토리(bean factory)
   - 스프링의 IoC를 담당하는 핵심 컨테이너를 가리킨다.
   - 빈을 등록하고, 생성하고, 조회하고 돌려주고, 그 외에 부가적인 빈을 관리하는 기능을 담당한다.
@@ -527,7 +524,7 @@ public class UserDaoTest {
 #### 싱글톤 패턴의 한계
 
 - private 생성자를 갖고 있기 때문에 상속할 수 없다.
-  - 애플리케이션의 로직을 담고 있는 일반 오브젝트의 경우 싱글톤으로 만들었을 때 객체지향적인 설계의 정점(상속과 이를 이용한 다형성)을 적용하기 어렵다는 점은 심각한 문제다.
+  - 애플리케이션의 로직을 담고 있는 일반 오브젝트의 경우 싱글톤으로 만들었을 때 객체지향적인 설계의 장점(상속과 이를 이용한 다형성)을 적용하기 어렵다는 점은 심각한 문제다.
 - 싱글톤은 테스트하기 힘들다.
 - 서버환경에서는 싱글톤이 하나만 만들어지는 것을 보장하지 못한다.
 - 싱글톤의 사용은 전역 상태를 만들 수 있기 때문에 바람직하지 못하다.
@@ -539,12 +536,13 @@ public class UserDao {
   
   	...
       
+    // 기본 생성자를 private으로 묶어서 DaoFactory에서 UserDao를 생성하면서 
+    // ConnectionMaker 오브젝트를 넣어주는 게 불가능해졌다.  
     private UserDao(ConnnectionMaker connnectionMaker) {
       	this.connectionMaker = connectionMaker;
     }
   
   	public static synchronized UserDao getInstance() {
-      	// 기본 생성자를 private으로 묶으니 이제 ConnectionMaker 오브젝트를 넣어주는게 불가능해졌다.
       	if (INSTANCE == null) INSTANCE = new UserDao(???);
       	return INSTANCE;
     }
@@ -567,7 +565,7 @@ public class UserDao {
 
 ### 1.6.2 싱글톤과 오브젝트의 상태
 
-- 기본적으로 싱글톤이 멀티스레드 환경에서 서비스 형태의 오브젝트로 사용되는 경우에는 상태정보를 내부에 갖고 있지 않은 무상태(stateless) 방식으로 만들어져야 한다.
+- 기본적으로 싱글톤이 멀티스레드 환경에서 서비스 형태의 오브젝트로 사용되는 경우에는 상태정보를 내부에 갖고 있지 않은 **무상태(stateless) 방식**으로 만들어져야 한다.
   - 상태가 없는 방식으로 클래스를 만드는 경우에 각 요청에 대한 정보나, DB나 서버의 리소스로부터 생성한 정보는 어떻게 다뤄야 할까?
     - 이때는 파라미터와 로컬 변수, 리턴 값 등을 이용하면 된다.
   - 동일하게 **읽기전용의 속성**을 가진 정보라면 싱글톤에서 **인스턴스 변수**로 사용해도 좋다.
@@ -620,79 +618,204 @@ public class UserDao {
 
 #### UserDao의 의존관계
 
-
+- UserDao는 ConnectionMaker 인터페이스에 의존하고 있다.
+  - ConnectionMaker 인터페이스가 변하면 UserDao는 그 영향을 직접적으로 받게 된다.
+  - UserDao가 바뀌어도 ConnectionMaker 인터페이스를 구현한 클래스들은 영향을 받지 않는다.
+- 모델링 의존관계
+  - UML에서 말하는 의존관계로 설계 모델의 관점에서 이야기하는 것.
+- 런타임 의존관계
+  - 모델이나 코드에서 클래스와 인터페이스를 통해 드러나는 의존관계 말고, 런타임 시에 오브젝트 사이에서 만들어지는 의존관계
+- 의존 오브젝트(dependent object)
+  - 프로그램이 시작되고 오브젝트들이 만들어지고 나서 런타임 시에 의존관계를 맺는 대상
+  - 실제 사용대상인 오브젝트
+  - 설계와 코드속에는 드러나지 않는다.
+- 의존관계 주입이란 아래의 세 가지 조건을 충족하는 작업을 말한다.
+  - 클래스 모델이나 코드에는 런타임 시점의 의존관계가 드러나지 않는다.
+    - 그러기 위해서는 인터페이스에만 의존하고 있어야 한다.
+  - 런타임 시점의 의존관계는 컨테이너나 팩토리 같은 제3의 존재가 결정한다.
+  - 의존관계는 사용할 오브젝트에 대한 레퍼런스를 외부에 제공(주입)해줌으로써 만들어진다.
 
 
 
 #### UserDao의 의존관계 주입
 
+- 런타임 시점의 의존관계를 결정하고 만들려면 제3의 존재가 필요하다.
+- DaoFactory
+  - 두 오브젝트 사이의 런타임 의존관계를 설정해주는 의존관계 주입 작업을 주도
+  - 동시에 IoC 방식으로 오브젝트의 생성과 초기화, 제공 등의 작업을 수행하는 컨테이너 
+- DI는 자신이 사용할 오브젝트에 대한 선택과 생성 제어권을 외부로 넘기고 자신은 수동적으로 주입받은 오브젝트를 사용한다는 점에서 IoC의 개념에 잘 들어맞는다.
+
+```java
+public class UserDao {
+  	private ConnectionMaker connectionMaker;
+  
+  	public UserDao(ConnectionMaker connectionMaker) {
+      	this.connectionMaker = connectionMaker;
+    }
+  
+  	...
+      
+}
+```
+
 
 
 ### 1.7.3 의존관계 검색과 주입
+
+- 의존관게 검색(dependency lookup)
+  - 의존관계를 맺는 방법이 외부로부터의 주입이 아니라 스스로 검색을 한다.
+    - 자신이 필요로 하는 의존 오브젝트를 능동적으로 찾는다.
+  - 런타임 시에 의존관계를 결정한다는 점은 의존관계 주입과 비슷하다.
+  - 자신이 어떤 클래스의 오브젝트를 이용할지 결정하지는 않는다.
+    - 런타임 시 의존관계를 맺을 오브젝트를 결정하는 것과 오브젝트의 생성 잡업은 외부 컨테이너에게 IoC로 맡긴다.
+    - 하지만 가지고 올 때는 메소드나 생성자를 통한 주입 대신 스스로 컨테이너에게 요청하는 방법을 사용
+  - 의존관게 주입 쪽이 훨씬 단순하고 깔끔하다.
+  - DI와 DL(의존관계 점색)의 중요한 차이점은 DL 방식은 검색을 하는 오브젝트는 자신이 스프링의 빈일 필요가 없다는 점이다.
+    - 검색으로 가지고 오는 오브젝트는 빈이어야 한다.
+    - DI를 원하는 오브젝트는 먼저 자기 자신이 컨테이너가 관리하는 빈이 돼야 한다는 사실을 잊지 말자.
+- DI 받는다
+  - 그냥 주입한다고 다 DI는 아니다.
+  - DI에서 말하는 주입은 다이내믹하게 구현 클래스를 결정해서 제공받을 수 있도록 **인터페이스 타입**의 파라미터를 통해 이뤄져야 한다.
+
+```java
+public UserDao() {
+  	DaoFactory daoFactory = new DaoFactory();
+  	this.connectionMaker = daoFactory.connectionMaker();
+}
+```
+
+```java
+public UserDao() {
+  	AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+  	this.connectionMaker = context.getBean("connectionMaker", ConnectionMaker.class);
+}
+```
 
 
 
 ### 1.7.4 의존관계 주입의 응용
 
+- DI 기술의 장점
+  - 앞에서 설명한 모든 객체지향 설계와 프로그래밍의 원칙을 따랐을 때 얻을 수 있는 장점이 그대로 DI 기술에도 적용될 것이다.
+  - 다른 책임을 가진 사용 의존관계에 있는 대상이 바뀌거나 변경되더라도 자신은 영향을 받지 않으며, 변경을 통한 다양한 확장 방법에는 자유롭다.
+    - 코드에는 런타임 클래스에 대한 의존관계가 나타나지 않고, 인터페이스를 통해 결합도가 낮은 코드를 만드므로
+
 
 
 #### 기능 구현의 교환
+
+- 초난감 DAO에서는 로컬 DB, 개발 DB, 운영 DB로 변경 하려고 하면 DAO가 100개 라면 매번 100군데의 코드를 수정해야 한다.
+- DI 방식을 적용하면 개발환경과 운영환경에서 DI의 설정정보에 해당하는 DaoFactory만 다르게 만들어두면 된다.
 
 
 
 #### 부가기능 추가
 
+- DAO가 DB를 얼마나 많이 연결하는지 파악하는 추가 기능을 만들고 싶다고해보자.
+  - ConnectionMaker 타입의 ConnectionMaker를 감싸는 클래스를 하나 만들어서 기능을 넣어주면 된다.
+
+```java
+@Configuration
+public class CountingDaoFactory {
+
+    @Bean
+    public UserDao userDao() {
+    // 모든 DAO는 여전히 connectionMaker()에서 만들어지는 오브젝트를 DI 받는다.
+        return new UserDao(connectionMaker());
+    }
+  
+  	@Bean
+    public ConnectionMaker connectionMaker() {
+        return new CountingConnectionMaker(realConnectionMaker());
+    }
+  
+  	@Bean
+    public ConnectionMaker realConnectionMaker() {
+        return new DConnectionMaker();
+    }
+}
+```
+
 
 
 ### 1.7.5 메소드를 이용한 의존관계 주입
 
+- 의존관계 주입 시 반드시 생성자를 사용해야 하는 것은 아니다.
+  - 일반 메소드를 사용할 수도 있을 뿐만 아니라, 생성자를 사용하는 방법보다 더 자주 사용된다.
+- 일반 메소드를 이용해서 의존관계를 주입하는 두 가지 방법
+  - 수정자 메소드를 이용한 주입
+    - 메소드를 이용한 DI 방법 중에서 가장 많이 사용
+  - 일반 메소드를 이용한 주입
 
-
-
-
-
+```java
+@Bean
+public UserDao userDao() {
+    UserDao userDao = new UserDao();
+    userDao.setConnectionMaker(connectionMaker());
+    return userDao;
+}
+```
 
 
 
 ## 1.8 XML을 이용한 설정
 
+- 스프링은 DaoFactory와 같은 자바 클래스를 이용하는 것 외에도, 다양한 방법을 통해 DI 의존관계 설정정보를 만들 수 있다.
+  - 가장 대표적인 것이 바로 XML이다.
+
+
+
 ### 1.8.1 XML 설정
+
+
 
 #### connectionMaker() 전환
 
+
+
 #### userDao() 전환
+
+
 
 #### XML의 의존관계 주입 정보
 
+
+
 ### 1.8.2 XML을 이용하는 애플리케이션 컨텍스트
+
+
 
 ### 1.8.3 DataSource 인터페이스로 변환
 
+
+
 #### DataSource 인터페이스 적용
 
-137
+
 
 #### 자바 코드 설정 방식
 
+
+
 #### XML 설정 방식
+
+
 
 ### 1.8.4 프로퍼티 값의 주입
 
+
+
 #### 값 주입
+
+
 
 #### value 값의 자동 변환
 
 
 
-
-
-
-
-
-
 ## 1.9 정리
 
-142
+
 
 
 
