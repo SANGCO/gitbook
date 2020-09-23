@@ -3,7 +3,7 @@
 
 
 * 토비의 스프링 3.1 Vol. 1
-    * [오브젝트와 의존관계](Tobis Spring 3.1/Objects and Dependencies.md)
+    * [오브젝트와 의존관계](Tobys Spring 3.1 Vol. 1/Objects and Dependencies.md)
     * [테스트](Tobys Spring 3.1 Vol. 1/Test.md)
     * [템플릿](Tobys Spring 3.1 Vol. 1/Template.md)
     * [예외](Tobys Spring 3.1 Vol. 1/Exception.md)
