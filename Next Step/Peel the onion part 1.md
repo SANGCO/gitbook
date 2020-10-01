@@ -261,6 +261,7 @@ public class StringCalculator {
 - 서블릿은 앞에서 구현했던 Controller와 정확히 같은 역할을 하며, 똑같은 방식으로 동작한다.
   - doGet() 메소드의 인자로 전달하는 HttpServletRequest, HttpServletResponse는 앞에서 구현한 HttpRequest, HttpResponse와 같다.
   - Controller 인터페이스는 서블릿의 Servlet 인터페이스, AbstractController는 HttpServlet과 같다.
+  - RequestHandler 역할은 서블릿 컨테이너가?
 - 서블릿 컨테이너가 시작하고 종료할 때의 과정
   - 서블릿 컨테이너 시작
   - 클래스패스에 있는 Servlet 인터페이스를 구현하는 서블릿 클래스를 찾음
@@ -311,6 +312,11 @@ public class StringCalculator {
 
 ### 6.3 세션(HttpSession) 구현
 
+- RequestHandler에서 HttpRequest를 생성
+  - HttpRequest가 클라이언트의 요청을 필드로 저장한다.
+  - HttpRequest의 HttpHeaders에는 요청의 헤더 정보가 저장되어 있다.
+  - 쿠키나 세션 등 필요할 때 get하면 그때 new 해서 만들어서 리턴
+
 
 
 ### 6.4 MVC 프레임워크 요구사항 1단계
@@ -318,6 +324,16 @@ public class StringCalculator {
 
 
 ### 6.5 MVC 프레임워크 구현 1단계
+
+- 서블릿은 DispatcherServlet 하나만
+  - 프론트 컨트롤러 패턴
+  - `private static final long serialVersionUID = 1L;`
+    - `public abstract class GenericServlet implements Servlet, ServletConfig, Serializable {`
+      - `Serializable` 구현하고 있다.
+- Controller 인터페이스를 만들고 기존 서블릿들을 Controller 타입으로 만든다.
+- RequestMapping 클래스를 만들어서 요청 URL과 서비스를 담당할 컨트롤러를 연결하는 작업을 하게 한다.
+  - 일급 컬렉션으로 구현한거 같다.
+- 217p 그림참고
 
 
 
@@ -327,19 +343,8 @@ public class StringCalculator {
 
 ### 6.7 추가 학습 자료
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+- 쿠키와 세션, 보안
+- 쉘 스크립트와 배포 자동화
 
 
 
@@ -347,28 +352,69 @@ public class StringCalculator {
 
 
 
-
-
 ### 7.1 회원 데이터를 DB에 저장하기 실습
+
+
 
 ### 7.2 DAO 리팩토링 실습
 
+
+
 ### 7.3 동영상을 활용한 DAO 리팩토링 실습
+
+
 
 ### 7.4 DAO 리팩토링 및 설명
 
+- 메소드 분리
+  - 변화가 발생하는 부분과 변화가 발생하지 않는 부분을 분리
+- 클래스 분리
+- UserDao와 InsertJdbcTemplate의 의존관계 분리
+  - 메소드는 존재하지만 구현을 담당하지 않으려면 두 개의 메소드를 추상 메소드로 구현하면 된다.
+- InsertJdbcTemplate과 UpdateJdbcTemplate 통합
+- User 의존관계 제거 및 SQL 쿼리 인자로 전달
+- SELECT문에 대한 리팩토링
+- JdbcTemplate과 SelectJdbcTemplate 통합하기
+- 인터페이스 추가를 통한 문제점 해결
+  - JdbcTemplate에 구현되어 있는 2개의 추상 메소드를 인터페이스로 분리한다.
+    - 메소드의 인자로 전달
+  - 변화 시점이 다른 부분을 서로 다른 인터페이스로 분리함으로써 공통 라이브러리에 대한 유연함을 높일 수 있게 되었다.
+  - 이 예제에서 사용한 인터페이스를 콜백 인터페이스라고 부른다.
+- 런타임 Exception 추가 및 AutoClosable 활용한 자원 반환
+- 제네릭(generic)을 활용한 개선
+- 가변인자를 활용해 쿼리에 인자 전달하기
+- 람다를 활용한 구현
+
+
+
 ### 7.5 추가 학습 자료
+
+- 데이터베이스
+- 디자인 패턴
 
 
 
 ## 8장 AJAX를 활용해 새로고침 없이 데이터 갱신하기
 
+
+
 ### 8.1 질문/답변 게시판 구현
+
+
 
 ### 8.2 AJAX 활용해 답변 추가, 삭제 실습
 
+
+
 ### 8.3 MVC 프레임워크 요구사항 2단계
+
+
 
 ### 8.4 MVC 프레임워크 구현 2단계
 
+
+
 ### 8.5 추가 학습 자료
+
+- REST API 설계 및 개발
+
