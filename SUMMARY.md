@@ -7,8 +7,8 @@
     * [테스트](Tobys Spring 3.1 Vol. 1/Test.md)
     * [템플릿](Tobys Spring 3.1 Vol. 1/Template.md)
     * [예외](Tobys Spring 3.1 Vol. 1/Exception.md)
-    * 서비스 추상화
-    * AOP
+    * [서비스 추상화](Tobys Spring 3.1 Vol. 1/Service Abstraction.md)
+    * [AOP](Tobys Spring 3.1 Vol. 1/AOP.md)
     * [IoC 컨테이너와 DI](Tobys Spring 3.1 Vol. 2/IoC container and DI.md)
     * 데이터 액세스 기술
     * [스프링 웹 기술과 스프링 MVC](Tobys Spring 3.1 Vol. 2/Spring Web and Spring MVC.md)

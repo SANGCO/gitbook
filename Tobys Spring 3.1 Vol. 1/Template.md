@@ -203,6 +203,9 @@
 
 ### 3.6.3 queryForObject()
 
+- RowMapper 콜백
+  - 템플릿으로부터 ResultSet을 전달받고, 필요한 정보를 추출해서 리턴하는 방식으로 동작
+
 
 
 ### 3.6.4 query()
