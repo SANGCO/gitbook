@@ -8,6 +8,150 @@
 
 
 
+### 원칙
+
+- 한가지 일만 해야 한다.
+- 밥 아저씨는 극단적으로 함수의 크기는 4줄짜리 여야 한단다.
+- indentation, while, nested if 등은 없어야 한다.
+- 잘 지어진 서술적인 긴 이름을 갖는 많은/작은 함수들로 유지해야 한다.
+  - small many functions
+  - nice descriptive long name
+
+
+
+### The First Rule of Functions
+
+- 더 이상 작아질 수 없을 만큼 작아야 한다.
+- 큰 함수를 보면 클래스로 추출할 생각을 해야한다.
+  - Extract Method Object
+- 클래스는 일련의 변수들에 동작하는 기능들의 집합
+
+
+
+### Fitness Example
+
+- Fitness Example
+  - https://github.com/msbaek/fitness-example
+  - 메소드명 include - 포함시키다
+    - includeSetups()
+    - includeTearDowns()
+- 개선
+  - 읽기 쉬워지고
+  - 이해하기 쉬워지고
+  - 함수가 자신의 의도를 잘 전달
+- 개선의 원인
+  - Small
+    - 함수의 첫번째 규칙
+    - 함수는 작아질 수 있는한 최대한 작아야 한다.
+  - 블록이 적어야 함
+    - if, else, while 문장 등의 내부 블록은 한줄이어야 한다.
+      - try catch 빼고는 괄호가 없어야 한다.
+        - 한 줄이면 괄호를 생략 할 수 있으니깐.
+      - 함수 호출 일 것
+  - Indenting이 적어야 함
+    - 함수는 중첩 구조를 갖을 만큼 크면 안된다.
+    - 들여쓰기는 한두단계 정도만
+
+
+
+### functions should do one thing
+
+- 하나 이상의 일을 하는 함수를 한가지 단순한 일만 하도록 리팩토링
+  - 함수의 각 스텝들이 함수 이름이 갖는 추상화 수준보다 한 단계 낮은 것으로만 이루어졌다. 
+    - 그렇다면 함수는 한가지 일만 하는 것이다.
+- 한가지 일만 하도록 하는 것
+  - 원래 코드는 추상화 수준이 다른 많은 단계들을 포함하므로 한가지 이상의 일을 한다는 것이 명확하다.
+  - 하지만 의미있게 최종적으로 줄이는 것은 어렵다.
+    - surround 메소드의 3줄을 includeSetupAndTeardownsIfTestPage 메소드로 추출
+      - 추상화 수준의 변경 없이 코드를 단순히 재인용하게 된다.
+  - 함수가 하나 이상의 일을 한다고 말할 수 있는 경우
+    - 단순한 구현의 재인용이 아닌 이름으로 함수를 추출할 수 있을 때
+- Reading code from top to bottom
+  - 함수를 구성하는 원칙
+  - 코드를 top-down 이야기체로 읽을 수 있도록 해줌
+  - 현재 함수 바로 밑에 현재 함수 다음의 추상화 수준을 갖는 함수들을 배치시킴
+
+```java
+public String surround() throws Exception {
+    if (ifTestPage())
+      	surroundPageWithSetUpsAndTearDowns();
+    return pageData.getHtml();
+}
+
+private void surroundPageWithSetUpsAndTearDowns() throws Exception {
+    content = includeSetups();
+    content += pageData.getContent();
+    content += includeTearDowns();
+    pageData.setContent(content);
+}
+
+private boolean ifTestPage() throws Exception {
+  	return pageData.hasAttribute("Test");
+}
+```
+
+
+
+### Where do classes go to hide?
+
+- 큰 함수는 실제로는 클래스가 숨어 있는 곳이다.
+- 큰 함수는
+  - 변수와 인자들
+  - 들여쓰기에 존재하고, 변수들을 사용해서 통신하는 기능들의 집합
+  - 항상 하나 이상의 클래스로 분리할 수 있다.
+
+
+
+### PrimeNumber 예제
+
+- https://github.com/msbaek/print-prime
+  - 복잡한 함수를 2개의 클래스로 Extract Method Object하는 과정
+
+
+
+### One thing???
+
+- function should do one things, do it well, do it only.
+  - 한가지만 해야하고 한가지를 잘해야 하며 오직 한가지만 해야 한다.
+- 리팩토링 전의 하나 이상의 일을 하던 메소드
+  - caller 입장에서는 one thing
+  - reader 입장에서는 one thing이 아니다.
+- 하나의 이상의 섹션으로 구성된 함수는 적어도 reader 입장에서는 one thing을 하는 것이 아니다.
+  - 코드를 읽을 사람이 가장 중요하고 존중 받아야 한다.
+- 큰 함수를 작은 함수들로 쪼갤 때 흥미로운 일을 수행
+  - 주요 섹션들을 함수로 추출
+  - 함수를 서로 다른 추상화 레벨로 분리
+    - 함수가 하나 이상의 추상화 레벨을 다루면 이 함수는 한가지 이상의 일을 하는 것이다.
+- 하지만 추상화 레벨은 불분명(fuzzy)하다.
+- Extract Till You Drop
+  - 함수가 한가지 일만 하는지 어떻게 확실할 수 있는가?
+  - 더 이상 extract할 수 없을 때까지 extract하라.
+  - extract할 코드를 가진 함수는 한가지 이상의 일을 하는 것이다.
+  - 4줄 이내의 함수들로만 구성된 클래스
+    - 작은 함수들로 구성되어 있는 클래스는 성격 이 다른 부분이 있다면 클래스 분리하기 쉬워진다.
+      - 메소드 그룹핑
+  - if, while문 등에서 {}가 보이면 extract 대상
+  - {}는 extract할 기회 
+
+
+
+### conclusion
+
+- 1st rule
+  - function should be small
+- 2nd rule
+  - smaller than that
+- 이름을 잘 지으면 당신뿐 아니라 모든 사람들의 시간을 절약해 준다.
+  - 이정표 역할을 하기 때문에
+  - 당신의 코드를 이해하기 위한 네비게이션 역할을 한다.
+  - 처음부터 좋은 이름이 안나올 수도 있다.
+    - 그럴땐 러프하게 만들어 놓고 점점 이름을 명확하게 변경해 나가면 된다.
+- 클래스는 큰 함수를 감춘다.
+  - 함수를 여러 클래스들에 잘 배분하려면 함수를 작게 만들어야 한다.
+  - 함수는 한가지 일만 해야 하고, 한가지만 하는지 확신할 수 있는 유일한 방법은 extract till you drop이다.
+
+
+
 ## Function Structure
 
 
@@ -152,8 +296,6 @@ fileCommandTemplate.process(myfile, new FileCommand() {
 
 
 
-
-
 ### CQS
 
 - side effect를 관리하는 좋은 방법
@@ -174,14 +316,14 @@ fileCommandTemplate.process(myfile, new FileCommand() {
 
 
 
-### Tell Don't Ask
+### Tell, Don't Ask
 
 
 - 로그인되었는지 아닌지 아는 것은 user 객체
   - 로그인 여부 상태는 user 객체에 속함
   - 왜 user 상태를 가져다가, user를 대신해서 결정을 하는가?
   - user가 해당 행위를 수행하는 것이 맞다.
-- Tell Don't Ask
+- Tell, Don't Ask
   - tell other object what to do
     - 다른 객체가 무엇인가를 하도록 말해라.
   - but not to ask object what the state is.
@@ -287,7 +429,6 @@ public static class IllegalCapacity extends RuntimeException {
     - 하위 클래스에서 어떤 exception이 유발되면 상위 클래스를 변경해야하고
     - 사용되는 모든 코드를 변경해야 함.
   - checked exception을 아예 사용하지 말라.
-
 - 스프링 컨테이너에서 runtime exception이 발생하면 디폴트는 롤백
   - checked exception이 발생하면 롤백이 아니다.
 - checked exception을 사용할 때
