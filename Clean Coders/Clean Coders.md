@@ -27,12 +27,13 @@
   - 데이터와 그 데이터를 조작하는 코드의 변경은 외부에 영향을 안 미침
   - 외부에 노출된 인터페이스만 변경되지 않는다면
   - 프로시저를 실행하는데 필요한 만큼의 데이터만 가짐
-- 단순한 시스템은 쉬운 절차지향
-  - 대학교 과제나, 논문 만들때 쓰는건 만들고 제출하고 버리니깐 그런건 단순하다고 할 수 있다.
-- 복잡하거나 요구사항 변화가 발생할 시스템은 객체지향
+- 단순한 시스템은 쉬운 절차지향으로
+  - 대학교 과제나, 논문 만들때 쓰는건 만들고 제출하고 버리니깐 그런건 단순하다고 할 수 있을까
+    - 사실상 단순한 시스템은 없다고 보는게
+- 복잡하거나 요구사항 변화가 발생할 시스템은 객체지향으로
   - 데이터의 변경이 해당 객체로만 제한되고 다른 객체에 영향을 미치지 않기 때문에
   - Encapsulation
-- SW는 계속 사용된다면 요구사항은 계속 바뀐다.
+- SW가 계속 사용된다면 요구사항은 계속 바뀐다.
 - 절차지향이 처음에 쉬울지 모르나 시간이 지나면 수정하기 어려운 구조가된다.
 
 
@@ -65,11 +66,12 @@
 
 ### Encapsulation
 
-- 내부적으로 어떻게 구현했는지를 감춰 내부의 변경(데이터, 코드)이 client가 변경되지 않도록
+- 내부적으로 어떻게 구현했는지를 감춰 내부의 변경(데이터, 코드)에 client가 변경되지 않도록
   - 코드 변경에 따른 비용 최소화
+  - 상태를 가진 객체가 일을하고 client는 해달라고 얘기만해라.
 - 객체지향의 기본
 - Strop Watch 예제
-- Tell, Don't Ask
+- **Tell, Don't Ask**
   - 데이터를 요청해서 변경하고 저장하라고 하지말고
   - 무슨 기능을 실행하라
   - 데이터를 잘 알고 있는 객체에게 기능을 수행하라고 하라.
@@ -97,11 +99,11 @@
     - 수퍼 타입의 구현을 재사용
   - 인터페이스 상속
     - 타입 정의만 상속
-- 상속은 객체에게 다형성을 제공
+- **상속은 객체에게 다형성을 제공**
 - **재사용**
-  - 고수준의 로직에서 사용하는 저수준의 로직이 바뀌어도 고수준의 로직은 영향을 받지 않는것
+  - 고수준의 로직에서 사용하는 **저수준의 로직이 바뀌어도 고수준의 로직은 영향을 받지 않는**것
     - 인터페이스만 보고 프로그래밍하면 저수준의 로직이 아무리 바뀌어도 고수준의 로직을 재사용 할 수 있다.
-  - 상위 객체에 공통된 로직을 올리고 상속 구조를 만드는건 OOP에서 얘기하는 재사용의 핵심이 아니다.
+  - 상속 구조를 만들어 상위 객체에 공통된 로직을 올리는건 OOP에서 얘기하는 재사용의 핵심이 아니다.
 
 
 
@@ -111,14 +113,14 @@
 - 상세한 구현으로부터 개념을 도출하는 과정
 - 타입 추상화
   - 공통된 데이터나 프로세스를 제공하는 객체들을 하나의 타입(인터페이스)으로 추상화하는 것
-- Programming to interface
+- **Programming to interface**
   - Client Code가 항상 Interface에 대한 레퍼런스를 사용해야 한다는 의미
   - Client는 구현 변경에 대해서 영향을 받지 않는다.
   - Interface Signature가 사용 가능한 모든 행위를 보여줌
   - 추상화를 통해 유연함을 얻기 위한 규칙
   - 사용되는 이유
     - 런타임에 프로그램의 행위를 변경하기 위해
-      - Client Code가 interface만 알고 있다면 Client Code에 변경을 하지 않고도 런타임에 프로그램의 행위를 변경할 수 있다.
+      - Client Code가 interface만 알고 있다면 Client Code에 변경을 하지 않고도 **런타임에 프로그램의 행위를 변경**할 수 있다.
       - DI하는 부분은 변경이 일어나도 Client Code에는 변경이 일어나지 않는다.
         - 로그를 사용할 때 SLF4J만 쳐다보고 프로그래밍을 하면 구현체가 향후에 바뀌어도 내 코드는 수정할 필요가 없는 것처럼.
     - 유지보수 측면에서 보다 나은 프로그램을 작성할 수 있게 함
@@ -132,6 +134,19 @@
   - DI
     - 스프링 컨테이너 같은 놈이 디펜던시를 주입해 준다.
     - 테스트가 용이해 진다.
+- 고수준과 저수준 관점에서 기능을 분리하고 설계하는 연습
+  - 상품 상세 정보와 추천 상품 목록 제공 기능
+    - 상품 번호를 이용해서 상품 DB에서 상세 정보를 구함.
+    - Daara API를 이용해서 추천 상품 5개 구함.
+    - 추천 상품이 5개 미만이면 같은 분류에 속한 상품 중 최근 한 달 판매가 많은 상품을 ERP에서 구해서 5개를 채움.
+  - 고수준
+    - 상품 번호로 상품 상세 정보 구함.
+    - 추천 상품 5개 구함.
+    - 인기 상품 구함.
+  - 저수준
+    - DB에서 상세 정보 구함.
+    - Daara API에서 상품 5개 구함.
+    - 같은 분류에서 속한 상품에서 최근 한 달 판매가 많은 상품 ERP에서 구함.
 
 
 
@@ -150,12 +165,13 @@
         - 다중상속 불가
         - 1개를 상속받고, 다른 한개는 따로 구현
           - 상속 자체를 잘못 사용할 수 있다.
-- composition(delegation)
+- **composition**(delegation 위임)
   - 유연성(변경 용이성) 증대
     - polymorphism + composition으로 인해
   - unit test(mock) 용이
   - TDD에 용이
   - Interface의 중요성
+- 상속하면 재사용과 상속보다는 조립을 떠올리자
 
 
 
@@ -666,6 +682,164 @@ public class BoundedStack implements Stack {
 
 
 ## Form
+
+
+
+### Coding Standards
+
+- 조직이 일정 수준의 크기가 되면 관료적인 문서화를 요구
+- 필요하다
+  - 하지만 별도의 문서는 반대
+- Coding Standards는 코드 내에서 명확하게 보여져야 한다.
+- 코드가 Coding Standards여야 한다.
+- 별도의 문서에 Coding Standards를 작성한다?
+  - 코드가 Coding Standards의 예로 적합하지 않다는 것을 의미
+  - 코드가 잘되어 있다면 별도의 문서는 필요없다.
+
+
+
+### Comments should be Rare
+
+- Coding Standards가 커멘트 작성을 강요하면
+  - 프로그래머는 필요해서가 아니라 해야 하므로 커멘트를 작성함.
+  - 이런 커멘트는 무의미하다.
+  - 이런 커멘트는 무시의 대상이된다.
+- 양치기 소년
+  - 코드를 보면 뻔히 보이는 무의미한 주석이 많아지면 개발자들이 주석을 잘 안보게 되면서 정작 중요한 주석을 놓치는 경우가 생길 수 있다. 
+- comments should be rare.
+  - 주석은 특별한 경우에 드물게 작성 되어야 한다.
+  - special cases
+  - programmer's intent를 위해 반드시 필요할 때
+  - 그 커멘트를 읽는 모든 사람들이 감사해야 한다.
+    - 쓸데없는 주석으로 읽는 사람의 짜증을 유발해서는 안되겠지?
+
+
+
+### Comments are Failures
+
+- 작성자의 의도가 잘 나타나게 프로그램을 작성 한다면 커멘트가 불필요해짐.
+- 코드로 의도를 나타낼 수 있을까?
+  - Assembly의 경우는 불가
+    - 커멘트가 필수적
+    - Pascal, Fortran, C도 다소 그런편
+    - 커멘트 없이 표현력이 뛰어난 코드를 작성하는 것은 매우 어렵다.
+  - Ruby, Java, C# 등은 매우 표현력이 뛰어남.
+- 모든 커멘트는 당신의 코드가 잘 표현되고 있지 못하는 것을 나타내는 실패의 상징이다.
+
+
+
+### Good Comments
+
+- Legal Comments
+- Informative Comments
+  - 정규식의 경우
+    - `// format matched kk:mm:ss EEE, MMM dd, yyyy`
+      - 이런식으로 보기 편하게 
+- Warning of Consequences
+- TODO Comments
+- Public API Documentation
+
+
+
+### Bad Comments
+
+- Mumbling
+- Redundant Explanations
+  - 중족적인 설명
+- Mandated Redundancy
+  - 자동적으로 만들어지는 커멘트들
+- Journal Comments
+  - 이제 git이 있는데 수정 내역을 주석으로 남길 필요가 있을까?
+- Noways Comments
+  - 디폴트 생성자다 뭐 이런 뻔한 커멘트들
+- Big Banner Comments
+  - 잘보이라고 넣는 배너 커멘트들
+- Closing Brace Comments
+  - for 문, if 문 끝이 여기다라고 알려주는 주석
+- Attribution Comments
+  - 누가 추가했는지
+- HTML in Comments
+  - 커맨트를 HTML로 남기는 경우
+  - 소스 diff 보기가 힘들어 진다.
+- Non-Local Information
+  - 멀리 떨어진 곳의 코드를 설명하는 커멘트는 커멘트와 무관하게 변경될 수 있다.
+  - 그런 커멘트를 작성하지 말라.
+  - 커멘트를 작성해야만 한다면 커멘트가 설명하는 코드와 밀접한 곳에 작성하라.
+
+
+
+### Vertical Formatting
+
+- 공란을 함부로 사용하지 말라.
+  - 메소드 사이
+  - 변수들 사이
+    - private 변수들과 public 변수들 사이
+  - 메소드 내
+    - 변수 선언과 메소드 실행의 나머지 부분 사이
+    - if/while 블록과 다른 고드 사이
+- 서로 관련된 것들을 vertical하게 근접해야 함.
+  - vertical한 거리가 그들간의 관련성을 나타낸다.
+    - 근접해 있는 코드들이 리팩토링 시에 별도의 메소드로 분리 될 수 있다.
+
+
+
+### Classes
+
+- 클래스란 무엇인가?
+  - private 변수들을 작성함으로써 클래스를 작성한다.
+  - 그리고 그 pirvate 변수들을 public 함수들로 조작한다.
+  - 외부에서 private 변수들이 없는 것 처럼 보인다.
+    - 외부에서 private 변수들이 안보여야는데 getter/setter를 제공하면 너무 잘보이겠지?
+- 객체의 상태를 외부에서 사용할 수 있도록 하는 getter/setter/property 등을 제공하는 것은 Bad Design
+  - 왜 변수를 private으로 선언하고, getter/setter를 제공하나?
+- Tell, Don's Ask
+  - 객체가 no observable state를 갖는다면
+    - 관찰할 수 없는 상태를 갖는다면
+    - 무엇을 하라고 시키기(tell) 쉽고
+    - ask할 가치가 없어진다.
+  - 이 규칙을 따르는 객체
+    - getter가 많지 않다.
+    - getter가 많지 않으므로 setter도 많지 않다.
+- max cohesive
+  - 메소드가 모든 변수를 조작하는 경우
+    - 응집도가 높다.
+- max cohesive class
+  - max cohesive 메소드들로만 구성된 클래스
+- getter/setter는 cohesive 하지 않다.
+  - 하나의 변수만 사용하기 때문
+  - 클래스가 getter/setter를 많이 가질 수록 덜 cohesive해진다.
+  - getter/setter가 없어야만 하나?
+    - 안 쓸수는 없으니 최소하라.
+      - 그래야 cohesion을 최대화할 수 있다.
+    - getter를 쓸 때 본래 변수를 그대로 노출하지 말라.
+      - 추상화를 통해 제공하라.
+        - 이부분의 적용은 고민을 해봐야 겠다.
+- Polymorphism이 생각나나?
+  - 내부 변수를 hide 했을 때의 이점
+  - 상세 구현을 덜 노출할 수록 polymorphic 클래스를 활용할 기회가 늘어남
+- Polymorphism은 independent deployability와 plugin structure의 핵심
+  - Polymorphism은 CarDriver(클라이언트 코드)를 Car(서버 코드)의 구현 변경으로부터 보호
+- 객체지향의 핵심
+  - **IoC를 통해 High Level Policy(클라이언트, 비즈니스 로직)를 Low Level Detail로 부터 보호하는 것**
+    - CarDriver와 Car의 고수준 정책이 DieselCar, ElectricCar, NuclearCar 등의 저수준 정책에 영향을 받지 않는다.
+    - IoC
+      - 런타임에는 CarDriver가 Car를 통해 DieselCar에 의존하더라도 소스 코드 의존성은 DieselCar가 Car 인터페이스를 사용하면서 의존하고 있다.
+
+
+
+### Data Structures
+
+
+
+
+
+### Boundaries
+
+
+
+
+
+### The Impedance Mismatch
 
 
 

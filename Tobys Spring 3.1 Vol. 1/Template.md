@@ -131,6 +131,17 @@
 
 - 전략 패턴의 기본 구조에 익명 내부 클래스를 활용한 방식
   - 이런 방식을 스프링에서는 템플릿/콜백 패턴이라고 부른다.
+- 템플릿
+  - 템플릿은 어떤 목적을 위해 미리 만들어둔 모양이 있는 틀
+  - 템플릿 메소드 패턴은 고정된 틀의 로직을 가진 템플릿 메소드를 슈퍼클래스에 두고, 바뀌는 부분을 서브클래스의 메소드에 두는 구조
+- 콜백
+  - 파라미터로 전달되지만 값을 참조하기 위한 것이 아니라 특정 로직을 담은 메소드를 실행시키기 위해 사용한다.
+  - 자바에서는 메소드 자체를 파라미터로 전달할 방법은 없기 때문에 메소드가 담긴 오브젝트를 전달해야 한다.
+  - functional object라고도 한다.
+- 콜백이 보이면 템플릿 등에서 호출되는 시점을 생각하면 덜 복잡해 보인다.
+  - 콜백을 호출하는 쪽에서는 `XxxCallback xxx` 콜백이 파라미터로 들어오면 `xxx.doSomething(Y y)`
+    - 콜백을 만들 때 인자값은 콜백을 사용하는 쪽에서 파라미터로 넣어준다.
+  - 262p 콜백이 두개인 것도 이렇게 보면 쉽다.
 
 
 
@@ -175,13 +186,125 @@
 
 #### 중복의 제거와 템플릿/콜백 설계
 
+- 템플릿/콜백 패턴을 적용할 때는 템플릿과 콜백의 경계를 정하고 템플릿이 콜백에게, 콜백이 템플릿에게 각각 전달하는 내용이 무엇인지 파악하는게 가장 중요하다.
+  - 그에 따라 콜백의 인터페이스를 정의해야 하기 때문
+
+```java
+public Integer calcSum(String filepath) throws IOException {
+  	BufferedReaderCallback sumCallback =
+    		new BufferedReaderCallback() {
+      			public Integer doSomethingWithReader(BufferedReader br) throws IOException {
+              	Integer sum = 0;
+              	String line = null;
+              	while((line = br.readLine()) != null) {
+                  	sum += Integer.valueOf(line);
+                }
+              	return sum;
+            }
+    		};
+  	return fileReadTemplate(filepath, sumCallback);
+}
+```
+
+```java
+public Integer calcMultiply(String filepath) throws IOException {
+  	BufferedReaderCallback multiplyCallback =
+    		new BufferedReaderCallback() {
+      			public Integer doSomethingWithReader(BufferedReader br) throws IOException {
+              	Integer multiply = 1;
+              	String line = null;
+              	while((line = br.readLine()) != null) {
+                  	multiply *= Integer.valueOf(line);
+                }
+              	return multiply;
+            }
+    		};
+  	return fileReadTemplate(filepath, multiplyCallback);
+}
+```
+
 
 
 #### 템플릿/콜백의 재설계
 
+```java
+public Integer doSomethingWithReader(BufferedReader br) throws IOException {
+    Integer sum = 0;
+    String line = null;
+    while((line = br.readLine()) != null) {
+      	sum += Integer.valueOf(line);
+    }
+    return sum;
+}
+```
+
+```java
+public Integer doSomethingWithReader(BufferedReader br) throws IOException {
+    Integer multiply = 1;
+    String line = null;
+    while((line = br.readLine()) != null) {
+     	 multiply *= Integer.valueOf(line);
+    }
+    return multiply;
+}
+```
+
+- 위 코드를 보면 공통적인 패턴이 발견된다.
+  - `sum = 0`, `multiply = 1`
+    - 이 부분은 템플릿을 호출하는 부분에서 파라미터로 넣게 리팩토링 
+  - `+=`, `*=`
+- 공통적인 패턴을 콜백에서 템플릿으로 넘긴다.
+  - 콜백과 템플릿 네이밍 변경
+
+```java
+public Integer calcSum(String filepath) throws IOException {
+  	LineCallback sumCallback =
+    		new LineCallback() {
+      			public Integer doSomethingWithLine(String line, Integer value) throws IOException {
+              	return value + Integer.valueOf(line);
+            }
+    		};
+  	return lineReadTemplate(filepath, sumCallback, o);
+}
+```
+
+```java
+public Integer calcSum(String filepath) throws IOException {
+  	LineCallback multiplyCallback =
+    		new LineCallback() {
+      			public Integer doSomethingWithLine(String line, Integer value) throws IOException {
+              	return value * Integer.valueOf(line);
+            }
+    		};
+  	return lineReadTemplate(filepath, multiplyCallback, 1);
+}
+```
+
 
 
 #### 제네릭스를 이용한 콜백 인터페이스
+
+```java
+public interface LineCallback<T> {
+  	T doSomethingWithLine(String line, T value);
+}
+```
+
+```java
+public <T> T lineReadTemplate(String filepath, LineCallback<T> callback, T initVal) throws IOException {
+  	BufferedReader br = null;
+  	try {
+        T res = initVal;
+        String line = null;
+        while((line = br.readLine()) != null) {  
+            res = callback.doSomethingWithLine(line, res);  
+        }    
+    		return res;  
+    }
+  	catch(IOException e) {...}
+  	finally {...}
+}
+```
 
 
 
@@ -205,6 +328,7 @@
 
 - RowMapper 콜백
   - 템플릿으로부터 ResultSet을 전달받고, 필요한 정보를 추출해서 리턴하는 방식으로 동작
+  - 이름 그대로 디비에서 가지고 온 데이터 로우들을 내가 원하는 타입으로 맵핑을 해서 반환
 
 
 
@@ -242,6 +366,101 @@
 
 ## 3.7 정리
 
+
+
+#### 예제 3.3
+
+**템플릿 메소드 패턴**(상속을 통한 확장)에서 **전략 패턴**으로
+
+변하지 않는 부분을 메소드로 분리 `jdbcContextWithStatementStrategy()`
+
+변하는 부분을 추상화한 인터페이스 타입(`StatementStrategy`)을 메소드의 파라미터로 넘긴다.
+
+`jdbcContextWithStatementStrategy(StatementStrategy stmt)`
+
+`add(final User user)` 메소드 안에서
+
+`StatementStrategy` 재정의해서 `jdbcContextWithStatementStrategy()` 메소드의 파라미터로 
+
+```java
+public void add(final User user) throws SQLException {
+		jdbcContextWithStatementStrategy(
+        new StatementStrategy() {			
+            public PreparedStatement makePreparedStatement(Connection c)
+							...
+            }
+        }
+		);
+	}
+```
+
+```java
+public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException {
+			
+		...
+  
+    c = dataSource.getConnection();
+  	ps = stmt.makePreparedStatement(c);
+		
+		...
+      
+}
+```
+
+
+
+#### 예제 3.4
+
+변하지 않는 부분 클래스로 분리 
+
+`jdbcContextWithStatementStrategy()`  - > `JdbcContext` 
+
+
+
+#### 예제 3.5.2
+
+```java
+public void executeSql(final String query) throws SQLException {
+    workWithStatementStrategy(
+        new StatementStrategy() {
+            public PreparedStatement makePreparedStatement(Connection c)
+                throws SQLException {
+                return c.prepareStatement(query);
+            }
+        }
+    );
+}	
+```
+
+```java
+public void deleteAll() throws SQLException {
+		this.jdbcContext.executeSql("delete from users");
+}
+```
+
+
+
+#### 예제 3.final
+
+```java
+private JdbcTemplate jdbcTemplate;
+
+private RowMapper<User> userMapper = 
+    new RowMapper<User>() {
+        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+          User user = new User();
+          user.setId(rs.getString("id"));
+          user.setName(rs.getString("name"));
+          user.setPassword(rs.getString("password"));
+          return user;
+        }
+		};
+
+public void add(final User user) {
+  	this.jdbcTemplate.update("insert into users(id, name, password) values(?,?,?)",
+                           user.getId(), user.getName(), user.getPassword());
+}
+```
 
 
 
