@@ -23,7 +23,7 @@
   - 하나의 파드 안에서 컨테이터 끼리는 localhost:상대방 포트번호
     - 하나의 파드 안에 컨테이너들 끼리 포트가 중복되면 안된다.
   - 생설 될 때 파드에 IP가 자동으로 할당 되는데 재생성시 변경된다.
-  - 쿼버네티스 클러스터 내에서만 IP를 통해 파드로 접근할 수 있다.
+  - 쿠버네티스 클러스터 내에서만 IP를 통해 파드로 접근할 수 있다.
     - 외부에서는 IP 주소로 파드로 접근할 수 없다.
 
 
@@ -40,9 +40,11 @@
 
 
 - NodeSchedule
-  - nodeSelector
-    - 파드를 만들 때 nodeSelector 항목에 원하는 노드의 키/밸류를 써주면 된다.
-    - 파드를 만들때 resources 항목에 필요한 메모리, 메모리 리밋 등을 넣어 줄 수 있다.
+  - 파드는 결국 여러 노드들 중에 한곳에 올라가야는데 2가지 방법이 있다.
+    - 내가 직접 선택
+      - nodeSelector
+        - 파드를 만들 때 nodeSelector 항목에 원하는 노드의 키/밸류를 써주면 된다.
+    - 스케줄러가 판단
 
 
 
@@ -56,6 +58,7 @@
 
 - ClusterIP 타입 서비스
   - 기본 타입
+  - 다른 노드에서도 가능
   - 클러스터 안의 노드나 파드에서 ClusterIP 타입 서비스를 이용해서 서비스에 연결된 파드에 접근한다.
   - 파드에도 IP가 있어서 그 IP로 파드에 접근 할 수 있지만 그 IP는 문제가 생기면 다시 할당되기 때문에 신뢰성이 떨어진다.
   - ClusterIP 타입 서비스의 클러스터 IP에 접근하면 항상 연결되어 있는 파드에 접근할 수 있다.
@@ -69,6 +72,8 @@
 
 - NodePort 타입 서비스
 
+  - External에서 노드 IP 서비스가 할당한 포트로 해서 접속 할 수 있다.
+  - 내부에서는 ClusterIP와 같이 서비스IP로 붙으면 파드에 접근 할 수 있다.
   - 클러스터에 연결되어 있는 모든 노드에 똑같은 포트를 할당
   - 서비스에 지정된 포트 번호만 사용하면 파드에 접근할 수 있다.
   - 노드의 IP와 서비스가 할당한 포트 번호로 노드에 접근하면 서비스에 연결된 파드들에 트레픽이 분산 되어서 간다. 
@@ -98,39 +103,37 @@
 
 - [강의자료](https://kubetm.github.io/practice/beginner/object-volume/)
 
-emptyDir
-
-Pod 안에 있는 Volume
-
-Pod 날라가면 날라간다.
-
-
-
-hostPath
-
-이름 그대로 파드가 올라가 있는 노드의 패스를 Volume으로 사용
-
-단점으로 파드가 다른 노드에 올라가면 사람이 추가적인 작업을 해줘야한다.
-
-노드에 있는 데이터를 파드에서 쓰기위한 용도
-
-파드에 데이터를 저장하기 위한 용도가 아니다는 점
+- emptyDir
+  - Pod 안에 있는 Volume
+  - Pod 생성시 만들어지고 삭제시 없어짐
+  - Pod 날라가면 날라간다.
+  - 이 Volume에 쓰이는 데이터는 일시적으로 사용할 목적의 데이터
 
 
 
-PV/PVC
-
-볼륨은 로컬일 수도 있고 클라우드에 연결 할 수도 있다.
-
-이런 각각의 Persistent Volume과 연결
-
-Pod는 Persistent Volume에 직접 연결하는게 아니라 Persistent Volume Claim을 통해서 PV로 붙는다.
-
-User 영역 Pod -> PVC
-
-Admin 영역 PV, Volume
+- hostPath
+  - 이름 그대로 파드가 올라가 있는 노드의 패스를 Volume으로 사용
+  - 단점으로 파드가 다른 노드에 올라가면 사람이 추가적인 작업을 해줘야한다.
+  - 노드에 있는 데이터를 파드에서 쓰기위한 용도
+  - 파드에 데이터를 저장하기 위한 용도가 아니다는 점
+  - 사전에 해당 Node에 경로가 있어야한다.
 
 
+
+- PV/PVC
+  - 볼륨은 로컬일 수도 있고 클라우드에 연결 할 수도 있다.
+    - 이런 각각의 볼륨을 Persistent Volume과 연결
+  - Pod는 Persistent Volume에 직접 연결하는게 아니라 Persistent Volume Claim을 통해서 PV로 붙는다.
+  - User 영역 Pod -> PVC
+  - Admin 영역 PV, Volume
+  - 흐름
+    - PV 정의 생성
+    - PVC 생성
+    - PV 연결
+    - Pod 생성시 PVC 마운팅
+  - 1대1
+  - 1대 다
+  - 클레임 요구한다 충분한 용량을
 
 
 
@@ -138,11 +141,45 @@ Admin 영역 PV, Volume
 
 - [강의자료](https://kubetm.github.io/practice/beginner/object-configmap_secret/)
 
-특정 정보 때문에 Dev와 Prod 이미지를 따로 가져갈 수는 없다.
+- 특정 정보 때문에 Dev와 Prod 이미지를 따로 가져갈 수는 없다.
 
-SSH, User 같은 상수 값 모아서 ConfigMap
+- 상수 값 모아서 ConfigMap으로
+  - 키 밸류, 키 밸류
 
-Key 값은 Secret
+- 보안적인 관리가 필요한 값을 모아서 Secret으로
+  - 키 밸류, 키 밸류
+    - 밸류는 Base64 인코딩을 해서 넣어줘야 한다.
+      - 파드로 들어갈 때는 디코딩이 되서 환경변수에서는 원래의 값이 보이게 된다.
+    - 밸류의 보안적인 요소는 인코딩해서 값을 가지고 있는게 아니다.
+      - 값이 디비에 있지 않고 메모리에 있다는 점이 보안적인 요소라네.
+        - 1 Mbyte
+        - 많이 만들면 성능에 문제가 생길 수도 있다고
+
+
+
+- Env (Literal)
+  - ConfigMap, Secret 키 밸류 상수 정의하는 방법 
+
+
+
+- Env (File)
+  - 파일을 ConfigMap으로
+    - 파일 이름이 키 내용이 밸류
+      - 파일 이름을 키로 쓰지 않고 키 따로 정의
+      - 설정 파일 참고
+    - Secret도 동일함.
+      - Secret은 만들어질 때 Base64로 인코딩을 한다.
+        - 파일 내용이 이미 인코딩 되어 있으면 두번 인코딩 되니깐 주의
+
+
+
+- Volume Mount (File)
+  - Env(File)에 마운트 패스가 추가된다.
+  - 마운트는 원본과 연결 시켜놓는다는 개념이라네.
+    - ConfigMap이 변하면 Pod의 내용도 변한다.
+    - Env(File)는 한번 주입해주면 끝.
+    - 장치를 마운트한다.
+      - 장치를 특정 파일/폴더에 할당한다는 뜻
 
 
 
@@ -152,9 +189,29 @@ Key 값은 Secret
 
 
 
+- Namespace
+  - Namespace 내에서 이름 중복 안된다.
+  - Namespace 별로 분리해서 관리된다.
+    - PV, Node 등 Namespace들이 공용으로 사용하는 오브젝트도 있다.
+  - Namespace를 지우면 그 안에 있는 자원들도 모두 지워지니깐 유의해야 한다.
 
 
 
+- ResourceQuota
+  - Pod들이 이 조건에 맞춰서 나눠쓴다.
+  - 이름 그대로 쿼터임.
+    - cpu, memory, storage, 오브젝트의 숫자 등
+  - requests
+  - limits
+
+
+
+- LimitRange
+  - 이것도 이름 그대로 레인지
+  - 하나의 Pod에 대한 설정
+  - min
+  - max
+  - maxLimitRequestRatio
 
 
 
@@ -164,11 +221,13 @@ Key 값은 Secret
 
 ### Replication Controller, ReplicaSet - Template, Replicas, Selector
 
-Replication Controller - Deprecated
+- [강의자료](https://kubetm.github.io/practice/beginner/controller-replicationcontroller_replicaset/)
 
-ReplicaSet - Replaced
+- Replication Controller - Deprecated
 
-Selector라는 기능은 ReplicaSet에만 있다.
+- ReplicaSet - Replaced
+
+- Selector라는 기능은 ReplicaSet에만 있다.
 
 
 
@@ -250,13 +309,19 @@ key: A 이고 operator: NotIn
 
 ### Deployment - Recreate, RollingUpdate
 
-
+- [강의자료](https://kubetm.github.io/practice/beginner/controller-deployment/)
 
 
 
 
 
 ### DaemonSet, Job, CronJob
+
+- [강의자료](https://kubetm.github.io/practice/beginner/controller-daemonset_job_cronjob/)
+
+
+
+
 
 
 
