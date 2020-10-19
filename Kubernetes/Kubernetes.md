@@ -231,85 +231,77 @@
 
 
 
-**Controller 기능**
-
-- Auto Healing
-  - 파드나 파드가 있는 노드가 내려가면 즉각적으로 인지하고 새로운 노드에 파드를 생성해 준다.
-
-- Auto Scaling
-  - 파드에 리소스의 리미트 상태가 되면 파드를 하나 더 만들어서 부하를 분산 시켜서 파드가 죽지 않게 않다.
-
-- Software Update
-  - 여러 파드에 버전을 업그레이드 하거나 롤백하는 기능 제공
-
-- Job
-  - 컨트롤러가 필요한 순간에만 파드를 만들어서 해당 작업을 이행하고 파드를 삭제
+- Controller 기능
+  - Auto Healing
+    - 파드나 파드가 있는 노드가 내려가면 즉각적으로 인지하고 새로운 노드에 파드를 생성해 준다.
+  - Auto Scaling
+    - 파드에 리소스의 리미트 상태가 되면 파드를 하나 더 만들어서 부하를 분산 시켜서 파드가 죽지 않게 않다.
+  - Software Update
+    - 여러 파드에 버전을 업그레이드 하거나 롤백하는 기능 제공
+  - Job
+    - 컨트롤러가 필요한 순간에만 파드를 만들어서 해당 작업을 이행하고 파드를 삭제
 
 
 
-설정 파일 spec에 template, replicas, selector
-
-Selector의 matchLabels, matchExpression
-
-
-
-라벨로 Replication Controller 오브젝트와 파드를 연결
-
-Replication Controller는 template에 있는 내용을 바탕으로 파드를 생성 하거나 업데이트 한다.
+- Template
+  - Controller는 파드가 죽으면 Template을 가지고 파드를 만들어 준다.
+  - 라벨로 Replication Controller 오브젝트와 파드를 연결
+  - Replication Controller는 template에 있는 내용을 바탕으로 파드를 생성 하거나 업데이트 한다.
 
 
 
-replicas에 적힌 숫자 만큼 파드를 만들어준다.
-
-Scale Out, Scale In 가능
-
-생성된 파드가 없는 상태에서 replicas 2를 주면
-
-컨트롤러 오브젝트가 template으로 파드 2개를 생성해 준다.
+- Replicas
+  - replicas에 적힌 숫자 만큼 파드를 만들어준다.
+  - Scale Out, Scale In 가능
+  - 생성된 파드가 없는 상태에서 replicas 2를 주면
+    - 컨트롤러 오브젝트가 template으로 파드 2개를 생성해 준다.
 
 
 
-selector에 matchLabels는 Replication Controller와 마찮가지로 라벨에 키벨류가 같아야 연결
-
-matchExpression 키와 벨류를 디테일하게 컨트롤
-
-**matchExpression 옵션**
-
-Exists
-
-key가 A 이고 operator: Exists
-
-벨류가 달라도 키 값이 A인 파드를 다 선택
-
-
-
-DoesNotExist
-
-key: A 이고 operator: DoesNotExist
-
-키에 A가 들어가지 않은 파드를 선택
-
-
-
-In
-
-key: A 이고 operator: In
-
-키에 A인 파드들 중에 밸류가 2와 3인 파드를 선택
-
-
-
-NotIn
-
-key: A 이고 operator: NotIn
-
-키에 A인 파드들 중에 밸류가 2와 3이 아닌 파드를 선택
+- Selector
+  - matchExpression 키와 벨류를 디테일하게 컨트롤
+  - matchExpression 옵션
+    - Exists
+      - key가 A 이고 operator: Exists
+      - 벨류가 달라도 키 값이 A인 파드를 다 선택
+    - DoesNotExist
+      - key: A 이고 operator: DoesNotExist
+      - 키에 A가 들어가지 않은 파드를 선택
+    - In
+      - key: A 이고 operator: In
+      - 키에 A인 파드들 중에 밸류가 2와 3인 파드를 선택
+    - NotIn
+      - key: A 이고 operator: NotIn
+      - 키에 A인 파드들 중에 밸류가 2와 3이 아닌 파드를 선택
 
 
 
 ### Deployment - Recreate, RollingUpdate
 
 - [강의자료](https://kubetm.github.io/practice/beginner/controller-deployment/)
+- 서비스 운영중에 재배포 할 때 도움을 주는 컨트롤러
+
+- 배포 방법
+  - ReCreate
+  - Rolling Update
+  - Blue/Green
+  - Canary
+    - Ingress Controller
+
+
+
+- Recreate
+  - Deployment 타입 Recreate
+  - Deployment가 ReplicaSet 생성
+  - revisionHistoryLimit
+    - 이름 그대로 revisionHistoryLimit를 1로 두면 새로운 ReplicaSet이 만들어 질 때 앞에 ReplicaSet을 지우지 않느다.
+      - 기본은 10개를 남긴다고
+
+
+
+- RollingUpdate
+  - Deployment 타입 RollingUpdate
+  - ReplicaSet이 추가로 생성 되면서 점진적으로 업데이트 된 파드를 늘려간다.
 
 
 
