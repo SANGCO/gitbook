@@ -417,14 +417,19 @@ public void upgradeLevels() {
 #### JavaMail을 이용한 테스트의 문제점
 
 - JavaMail에는 구현을 바꿔치기할 만한 인터페이스가 보이지 않는다.
+- JavaMail처럼 테스트하기 힘든 구조인 API를 테스트하기 좋게 만드는 방법이 있다.
+  - 서비스 추상화를 적용
 
 
 
 #### 메일 발송 기능 추상화
 
 - JavaMail의 서비스 추상화 인터페이스 MailSender
-- 스프링이 제공하는 JavaMailSender 인터페이스
-  - MailSender 인터페이스의 하위 인터페이스 JavaMailSender
+- JavaMail을 사용해 메일 발송 기능을 제공하는 JavaMailSenderImpl 클래스
+- 이전에는 JavaMail API를 직접 사용해서 메일 발송
+  - 추상화로 한겹 감싸서 구체적인 기술이 보이지 않게한 MailSender 구현체 사용
+  - try/catch 블록 등이 사라지면서 코드가 깔끔해진다.
+  - MailSender 인터페이스 타입의 테스트용 구현체를 만들어서 테스트에서 사용할 수 있다.
 
 
 
