@@ -705,11 +705,12 @@ public class BoundedStack implements Stack {
   - 이런 커멘트는 무의미하다.
   - 이런 커멘트는 무시의 대상이된다.
 - 양치기 소년
-  - 코드를 보면 뻔히 보이는 무의미한 주석이 많아지면 개발자들이 주석을 잘 안보게 되면서 정작 중요한 주석을 놓치는 경우가 생길 수 있다. 
+  - 코드를 보면 뻔히 보이는 무의미한 주석이 많아지면 개발자들이 주석을 잘 안보게 되면서 **정작 중요한 주석**을 놓치는 경우가 생길 수 있다. 
 - comments should be rare.
   - 주석은 특별한 경우에 드물게 작성 되어야 한다.
   - special cases
-  - programmer's intent를 위해 반드시 필요할 때
+  - programmer's intent(흥미)를 위해 반드시 필요할 때
+    - 프로그래머의 의도가 클래스명, 메소드명, 변수명 등으로 잘 들어나야지만 그게 안될 경우. 
   - 그 커멘트를 읽는 모든 사람들이 감사해야 한다.
     - 쓸데없는 주석으로 읽는 사람의 짜증을 유발해서는 안되겠지?
 
@@ -738,6 +739,7 @@ public class BoundedStack implements Stack {
 - Warning of Consequences
 - TODO Comments
 - Public API Documentation
+  - public API의 경우 내 코드를 보고 내 의도를 잘 이해하기를 기대하지 말고 중복이 있더라도 주저리주저리 설명해 놓자.
 
 
 
@@ -745,11 +747,11 @@ public class BoundedStack implements Stack {
 
 - Mumbling
 - Redundant Explanations
-  - 중족적인 설명
+  - 중복적인 설명
 - Mandated Redundancy
   - 자동적으로 만들어지는 커멘트들
 - Journal Comments
-  - 이제 git이 있는데 수정 내역을 주석으로 남길 필요가 있을까?
+  - git이 있는데 수정 내역을 주석으로 남길 필요가 있을까?
 - Noways Comments
   - 디폴트 생성자다 뭐 이런 뻔한 커멘트들
 - Big Banner Comments
@@ -776,7 +778,28 @@ public class BoundedStack implements Stack {
     - private 변수들과 public 변수들 사이
   - 메소드 내
     - 변수 선언과 메소드 실행의 나머지 부분 사이
-    - if/while 블록과 다른 고드 사이
+    - if/while 블록과 다른 코드 사이
+
+```java
+public String toString() {
+    StringBuffer result = new StringBuffer();
+
+    result.append("[");
+    for (Object word : words) {
+        result.append(word);
+        result.append(",");
+    }
+
+    int end = result.length() - 1;
+
+    if (result.charAt(end) == ',')
+        result.deleteCharAt(end);
+
+    result.append("]");
+    return result.toString();
+}
+```
+
 - 서로 관련된 것들을 vertical하게 근접해야 함.
   - vertical한 거리가 그들간의 관련성을 나타낸다.
     - 근접해 있는 코드들이 리팩토링 시에 별도의 메소드로 분리 될 수 있다.
@@ -787,7 +810,7 @@ public class BoundedStack implements Stack {
 
 - 클래스란 무엇인가?
   - private 변수들을 작성함으로써 클래스를 작성한다.
-  - 그리고 그 pirvate 변수들을 public 함수들로 조작한다.
+  - 그리고 그 pirvate 변수들은 public 함수들로 조작한다.
   - 외부에서 private 변수들이 없는 것 처럼 보인다.
     - 외부에서 private 변수들이 안보여야는데 getter/setter를 제공하면 너무 잘보이겠지?
 - 객체의 상태를 외부에서 사용할 수 있도록 하는 getter/setter/property 등을 제공하는 것은 Bad Design
@@ -796,6 +819,7 @@ public class BoundedStack implements Stack {
   - 객체가 no observable state를 갖는다면
     - 관찰할 수 없는 상태를 갖는다면
     - 무엇을 하라고 시키기(tell) 쉽고
+      - 객체가 가지고 있는 public 메소드 호출
     - ask할 가치가 없어진다.
   - 이 규칙을 따르는 객체
     - getter가 많지 않다.
@@ -813,7 +837,14 @@ public class BoundedStack implements Stack {
       - 그래야 cohesion을 최대화할 수 있다.
     - getter를 쓸 때 본래 변수를 그대로 노출하지 말라.
       - 추상화를 통해 제공하라.
-        - 이부분의 적용은 고민을 해봐야 겠다.
+      - Car 클래스 gallonsOfGas 변수
+        - getGallonsOfGas라는 이름은 너무 구현 내용을 드러낸다.
+          - 이 메소드 사용자들은 클래스에 gallonsOfGas라는 변수가 있다는 것을 추론할 수 있다.
+        - Car 클래스를 상속하는 DieselCar
+          - 디젤차는 가솔린을 사용하지 않는다.
+            - 근데 getGallonsOfGas 메소드를 가지면 안되겠지?
+          - getPercentFuelRemaining()
+            - 추상화해서 제공
 - Polymorphism이 생각나나?
   - 내부 변수를 hide 했을 때의 이점
   - 상세 구현을 덜 노출할 수록 polymorphic 클래스를 활용할 기회가 늘어남
@@ -829,21 +860,90 @@ public class BoundedStack implements Stack {
 
 ### Data Structures
 
+- Data Structure는 Class와 반대되는 개념이다.
+  - class
+    - private 변수들 + 이를 다루는 함수들
+    - cohesive groups of variables를 조작하는 메소드
+    - 구현을 hide, abstract
+    - Tell이 가능
+  - data structure
+    - public 변수들 + getter/setter
+    - 개별 변수들을 조작(getter/setter)
+    - 구현을 노출
+    - Tell은 불가, Ask만 가능
+- class
+  - 객체에게 generic한 일을 수행하라고 tell할 수 있다.
+    - 그러면 자동으로 타입에 맞는 적절한 행위가 발생한다.
+- data structure
+  - generic한 행위를 수행하라고 tell할 수 없다.
+  - type에 기반하여 메소드 호출을 해야 한다.
+    - 아마 switch 문장을 사용해야 할 것이다.
+  - DS(data structure)가 switch 문장과 연관된 것은 class가 polymorphism과 연관된 것과 같은 관계다.
+  - switch 문장을 보게되면 DS가 숨어있다는 것을 알게된다.
 
+
+
+사진의 화살표는 런타임 의존성이 아니라 소스코드 의존성이다.
 
 
 
 ### Boundaries
 
-
+- Main 파티션을 App 파티션과 어떻게 분리할 것인가
+  - Main이 App 파티션의 플러그인
+    - 플러그인?
+- Main/App 파티션을 나누는 것은 Boundary의 일예이다.
+  - 다른 2가지 예로 Model/View, DB/Domain Object 등이 존재
+- 각 Boundary에서 한 쪽은 Concrete(Main)하고, 다른 한쪽은 Abstract(App)하다.
+- Boundary 사용시 항상 Concrete에서 Abstract로 소스 코드 의존성이 있어야 한다.
+- Database
+  - DB Interface Layer -> Database는 이해가 용이
+  - DB Interface Layer -> Application and Domain Objects는 납득이 안됨
+    - DB Interface Layer가 concrete하고  Application and Domain Objects는 abstract하니 이론상은 맞는 말
+    - DIP
+      - OOP에선 런타임 의존성을 변경하지 않고, 소스 코드 의존성을 inversion
+      - application이 DB Interface Layer의 존재를 모르고도 DB Interface Layer를 호출할 수 있다는 것을 의미
 
 
 
 ### The Impedance Mismatch
 
-
-
-
+- OOD에서  RDB를 사용할 때 발생하는 일련의 개념적/기술적 어려움
+  - OOD?
+  - 특히 객체나 클래스의 정의가 데이터베이스 테이블이나 관계 스키마에 직접 매핑될 때 발생
+- DB table은 DS이다.
+  - data를 노출하고, 메소드는 없다.
+  - class와 반대
+  - DB 테이블은 너무나 concrete해서 polymorphic할 수 없다.
+- DB는 도메인 객체, 비즈니스 객체, 어떤 객체도 포함될 수 없다.
+  - 오직 DS만 포함한다.
+  - 강제로 DS를 객체화할 수 없다.
+- ORM
+  - Hibernate
+  - 진정한 object-relational mapper는 아니다.
+  - 왜냐하면 DB row와 객체간의 직접적인 매핑이 없기 때문이다.
+    - 하나는 DS이고 다른 하나는 객체이기 때문이다.
+  - 실제로 이런 툴은 RDB 테이블 -> DS로의 매퍼이다.
+  - Hibernate는 DB의 DS를 Memory의 DS로 매핑한다.
+- Application/Domain Objects의 메소드들이 비즈니스 규칙이다.
+  - 일련의 비즈니스 규칙들을 도메인 객체에 구현하여 클래스를 만든다.
+  - 이 클래스들은 DB의 구조나 스키마와는 다른 모습으로 갖는다.
+  - 이게 RDB와 OOD 간의 진정한 임피던스 불일치이다.
+    - 임피던스 불일치?
+  - 대개의 DB는 특정 Application을 위해서가 아니라 Enterprise를 위해서 최적화된다.
+- DB 스키마는 enterprise의 security, performance를 위해 설계된다.
+  - 개별 app는 다른 스키마 디자인을 원할 것이다.
+  - 하지만 enterprise 전체의 combined needs에 순응해야만 한다.
+- application boundary 측면에서는 enterprise 스키마를 객체 설계를 통해 분리할 수 있다.
+  - 이게 진짜 객체이다. 메소드를 노출하고 데이터를 감추는
+  - 이렇게 해야 테이블 row를 조작하는 대신 비즈니스 객체를 조작함으로써 어플리케이션을 보다 자연스럽게 하고 이해하기 쉽게 한다.
+- DB Interface Layer는 DB에 존재하는 DS를 Application이 사용하고자 하는 비즈니스 객체로 전환하는 책임을 갖는다.
+  - 나아가 Application은 DB Interface Layer의 존재 조차도 모르게 한다.
+  - 왜냐하면 모든 소스 코드 의존성은 DB에서 Application으로 행해야 하기 때문이다.
+  - 이 말은 Application 계층에 데이터 액세스를 제공하는 인터페이스를 갖게 된다는 것을 의미한다.
+  - 비즈니스 객체가 이 인터페이스를 이용해서 자신이 원하는 데이터에 접근한다.
+- View와 Application의 관계도 마찬가지다.
+  - View가 concrete이므로 Application에 의존성을 가져야 한다.
 
 
 
