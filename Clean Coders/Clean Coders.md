@@ -883,39 +883,52 @@ public String toString() {
 
 
 
-사진의 화살표는 런타임 의존성이 아니라 소스코드 의존성이다.
-
-
-
 ### Boundaries
+
+<img src="Clean Coders.assets/image-20201027182707746.png" alt="image-20201027182707746" style="zoom:50%;" />
+
+- App Partition을 살펴보면 네모 상자가 Factory를 의존하고 있다.
+  - 저기 Factory는 인터페이스
+- Main Partition을 살펴보면 Factory Imp가 App Partition의 Factory를 의존하고 있다.
+  - Factory Imp는 Factory 인터페이스의 구현체이기 때문에 인터페이스에 변화가 일어나면 연향을 받기 때문에 의존한다고 볼 수 있다.
+- Boundary로 살펴보면 Main Partition이 App Partition에 소스 코드 의존성이 있다.
+  - 런타임에 의존성은  App Partition의 네모 상자가 Main Partition의 Factory Imp를 사용하니깐 의존관계가 역전된다.
+
+- 밑에는 설명이나 자료가 좀 헷갈리게 되어있는거 같다 패스
 
 - Main 파티션을 App 파티션과 어떻게 분리할 것인가
   - Main이 App 파티션의 플러그인
-    - 플러그인?
+    - Main 파티션의 구현체가 App 파티션으로 플러그인, 끼어 들어간다.
 - Main/App 파티션을 나누는 것은 Boundary의 일예이다.
   - 다른 2가지 예로 Model/View, DB/Domain Object 등이 존재
-- 각 Boundary에서 한 쪽은 Concrete(Main)하고, 다른 한쪽은 Abstract(App)하다.
+- 각 Boundary에서 한 쪽은 Concrete(Main)하고, 다른 한 쪽은 Abstract(App)하다.
 - Boundary 사용시 항상 Concrete에서 Abstract로 소스 코드 의존성이 있어야 한다.
-- Database
-  - DB Interface Layer -> Database는 이해가 용이
-  - DB Interface Layer -> Application and Domain Objects는 납득이 안됨
-    - DB Interface Layer가 concrete하고  Application and Domain Objects는 abstract하니 이론상은 맞는 말
-    - DIP
-      - OOP에선 런타임 의존성을 변경하지 않고, 소스 코드 의존성을 inversion
-      - application이 DB Interface Layer의 존재를 모르고도 DB Interface Layer를 호출할 수 있다는 것을 의미
+
+<img src="Clean Coders.assets/image-20201027185450801.png" alt="image-20201027185450801" style="zoom:50%;" />
+
+- 이 부분은 설명과 자료가 좀 애매함.
+- 사진의 화살표는 소스코드 의존성이라고 한다.
+- 위에 그림을 나름 이해해 본다면
+  - Application and Domain Objects는 DB Interface Layer의 Interface만 알고 있다.
+  - DB Interface Layer는 이름이 Interface Layer라고 되어 있지만 구현체이다.
+    - 그래서 DB Interface Layer의 구현체가 Application and Domain Objects의 인터페이스를 소스 코드 의존하고 있다.?
+  - Application and Domain Objects는 Abstract해서 Concrete한 Database를 의존해서는 안된다.
+    - 중간에 DB Interface Layer를 만들어서 Concrete 한 쪽이 Abstract 한 쪽을 의존하게 만든다.
+- DIP
+  - OOP에선 런타임 의존성을 변경하지 않고, 소스 코드 의존성을 inversion
+  - application이 DB Interface Layer의 존재를 모르고도 DB Interface Layer를 호출할 수 있다는 것을 의미
 
 
 
 ### The Impedance Mismatch
 
-- OOD에서  RDB를 사용할 때 발생하는 일련의 개념적/기술적 어려움
-  - OOD?
+- OOP에서  RDB를 사용할 때 발생하는 일련의 개념적/기술적 어려움
   - 특히 객체나 클래스의 정의가 데이터베이스 테이블이나 관계 스키마에 직접 매핑될 때 발생
 - DB table은 DS이다.
   - data를 노출하고, 메소드는 없다.
   - class와 반대
   - DB 테이블은 너무나 concrete해서 polymorphic할 수 없다.
-- DB는 도메인 객체, 비즈니스 객체, 어떤 객체도 포함될 수 없다.
+- DB는 도메인 객체, 비즈니스 객체, 어떤 객체도 포함할 수 없다.
   - 오직 DS만 포함한다.
   - 강제로 DS를 객체화할 수 없다.
 - ORM
@@ -925,11 +938,10 @@ public String toString() {
     - 하나는 DS이고 다른 하나는 객체이기 때문이다.
   - 실제로 이런 툴은 RDB 테이블 -> DS로의 매퍼이다.
   - Hibernate는 DB의 DS를 Memory의 DS로 매핑한다.
+    - Hibernate가 해준 것에다가 뭔가 추가적인 작업을 해줘야 비즈니스 객체가 된다.  
 - Application/Domain Objects의 메소드들이 비즈니스 규칙이다.
   - 일련의 비즈니스 규칙들을 도메인 객체에 구현하여 클래스를 만든다.
   - 이 클래스들은 DB의 구조나 스키마와는 다른 모습으로 갖는다.
-  - 이게 RDB와 OOD 간의 진정한 임피던스 불일치이다.
-    - 임피던스 불일치?
   - 대개의 DB는 특정 Application을 위해서가 아니라 Enterprise를 위해서 최적화된다.
 - DB 스키마는 enterprise의 security, performance를 위해 설계된다.
   - 개별 app는 다른 스키마 디자인을 원할 것이다.
@@ -937,8 +949,12 @@ public String toString() {
 - application boundary 측면에서는 enterprise 스키마를 객체 설계를 통해 분리할 수 있다.
   - 이게 진짜 객체이다. 메소드를 노출하고 데이터를 감추는
   - 이렇게 해야 테이블 row를 조작하는 대신 비즈니스 객체를 조작함으로써 어플리케이션을 보다 자연스럽게 하고 이해하기 쉽게 한다.
+
+<img src="Clean Coders.assets/image-20201027192350002.png" alt="image-20201027192350002" style="zoom:50%;" />
+
 - DB Interface Layer는 DB에 존재하는 DS를 Application이 사용하고자 하는 비즈니스 객체로 전환하는 책임을 갖는다.
   - 나아가 Application은 DB Interface Layer의 존재 조차도 모르게 한다.
+    - 그림에도 나와 있듯이 인터페이스만 알고있다.
   - 왜냐하면 모든 소스 코드 의존성은 DB에서 Application으로 행해야 하기 때문이다.
   - 이 말은 Application 계층에 데이터 액세스를 제공하는 인터페이스를 갖게 된다는 것을 의미한다.
   - 비즈니스 객체가 이 인터페이스를 이용해서 자신이 원하는 데이터에 접근한다.

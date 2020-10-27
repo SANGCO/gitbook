@@ -313,7 +313,31 @@
 
 
 
+- DaemonSet
+  - 노드의 자원 상태와 상관없이 노드에 파드가 하나씩 생긴다는 특징이 있다.
+    - ReplicaSet은 자원을 봐가면서 Pod가 생길 수도 안 생길 수도 있다.
+  - 한 노드에 하나 이상의 Pod를 만들 수는 없지만 Pod를 안만들 수는 있다.
+  - 대표적인 3가지 예
+    - Performance
+    - Logging
+    - Storage
 
+
+
+- Job
+  - 파드를 만들고 일이 끝나면 없앤다.
+  - 파드를 만드는 주체에 따라서 상황별로 파드의 동작이 다르다.
+    - 직접 만든 Pod
+    - ReplicaSet을 통해서 만들어진 Pod
+    - Job을 통해서 만들어진 Pod
+
+
+
+- CronJob
+  - Job을 만들고 잡들이 Pod를 만들고
+  - Allow
+  - Forbid
+  - Replace
 
 
 
