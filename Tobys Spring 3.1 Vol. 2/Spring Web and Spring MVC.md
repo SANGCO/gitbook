@@ -120,6 +120,17 @@ DefaultHandlerExceptionResolver
 SimpleMappingExceptionResolver
 3.5.2 지역정보 리졸버
 3.5.3 멀티파트 리졸버
+
+- 멀티 파트 처리를 담당하는 다양한 구현으로 바꿀 수 있도록 설계되어 있다.
+  - 현재는 아파치 `Commons`의 `FileUpload` 라이브러리를 사용하는 `CommonsMultipartResolver` 한 가지만 지원된다.
+- 멀티파트 리졸버 전략은 디폴트로 등록되는 것이 없다.
+  - 스프링부트에서는 `MultipartAutoConfiguration` 클래스 에서 `StandardServletMultipartResolver` 클래스를 등록해준다. 
+- DispatcherServlet이 클라이언트로부터 멀티파트 요청을 받으면 멀티파트 리졸버에게 요청
+  - 멀티파트 리졸버가 HttpServletRequest의 확장 타입인 MultipartHttpServletRequest 오브젝트로 전환
+    - 멀티파트 리졸버가 멀티파트 문제를 리졸브 해준다(해결해주다).
+
+
+
 RequestToViewNameTranslator
 
 

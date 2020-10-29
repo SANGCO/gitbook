@@ -2,7 +2,7 @@
 
 
 
-- [운영체제 정리](Operating system/Operating system.md)
+- [운영체제](Operating system/Operating system.md)
 
 
 
@@ -19,7 +19,7 @@
 
 
 
-- [쿠버네티스 정리](Kubernetes/Kubernetes.md)
+- [쿠버네티스](Kubernetes/Kubernetes.md)
 
 
 
