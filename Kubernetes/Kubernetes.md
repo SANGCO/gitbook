@@ -347,6 +347,68 @@
 
 
 
+### Pod - Lifecycle
+
+- Phase
+  - Pod의 전체 상태를 대표하는 속성
+- Conditions
+  - Pod 생성되면서 실행하는 단계와 그 단계의 상태를 나타낸다.
+- ContainerStatuses 안에 status
+  - 컨테이너의 상태를 나타낸다.
+
+
+
+### Pod - ReadinessProbe, LivenessProbe
+
+- [강의자료](https://kubetm.github.io/practice/intermediate/pod-probe/)
+
+
+
+- ReadinessProbe
+  - App 구동 순간에 트래픽 실패를 없앤다.
+- LivenessProbe
+  - App 장애시 지속적인 트래픽 실패를 없앤다.
+
+
+
+### Qos Classes
+
+- Guaranteed
+- Burstable
+- BestEffort
+
+
+
+### Pod - Node Scheduling
+
+- [강의자료](https://kubetm.github.io/practice/intermediate/pod-node_scheduling/)
+
+
+
+- 노드셀렉터
+  - 노드를 선택하는 기능
+  - 파드가 클러스터 안 어떤 노드에서 실행될지를 키-값 쌍으로 설정
+  - 가장 간단한 스케줄링 옵션
+  - 파드의 .spec 필드에 설정할 수 있는 노드셀렉터
+- 어피니티와 안티 어피니티
+  - 노드 어피니티
+    - 노드셀렉터와 비슷하게 노드의 레이블 기반으로 파드를 스케줄링한다.
+    - 노드 어피니티 두 가지 필드
+      - requiredDuringSchedulingIgnoredDuringExecution
+      - preferredDuringSchedulingIgnoredDuringExecution
+  - 파드의 어피니티와 안티 어피니티
+    - 파드들을 함께 묶어서 같은 노드에서 실행하도록 설정하는 어피니티
+    - 파드들을 다른 노드에 나누어서 실행하도록 설정하는 안티 어피니티
+      - CPU나 네트워크 같은 하드웨어 자원을 많이 사용하는 앱 컨테이너가 있을 때 여러 노드로 파드를 분산
+- 테인트와 톨러레이션 사용하기
+  - 쿠버테니스 클러스터의 특정 노드에 테인트를 설정할 수 있다.
+    - 테인트를 설정한 노드에는 파드들을 스케줄링하지 않는다.
+    - 테인트를 설정한 노드에 파드들을 스케줄링하려면 톨러레이션을 설정해야 한다.
+      - 테인트는 톨러레이션에서 설정한 특정 파드들만 실행하고 다른 파드는 실행하지 못하게 한다.
+  - 테인트와 톨러레이션의 하위 필드
+
+
+
 ## [중급편] 기본 오브젝트
 
 
