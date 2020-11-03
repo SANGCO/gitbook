@@ -137,31 +137,30 @@ public abstract class EnumSet<E extends Enum<E>>
 
         - [Class.forName을 활용해 jdbc driver를 등록하는 과정](https://www.slipp.net/questions/276)
 
-          - Class.forName("package.ClassName")를 실행하는 경우 문자열로 전달되는 클래스가 존재하는 클래스를 메모리에 로드하는 역할
+          - Class.forName("package.ClassName")를 실행하는 경우 문자열로 전달되는 클래스가(ex. com.mysql.jdbc.Driver) 존재하는 클래스를 메모리에 로드하는 역할
 
-          - 클래스가 메모리에 로드되면서 static 절이 실행된다.
+          - Driver 클래스가 메모리에 로드되면서 static 절이 실행된다.
 
             ```java
-             public class Driver extends NonRegisteringDriver implements java.sql.Driver {
-                 static {
-                     try {
+            public class Driver extends NonRegisteringDriver implements java.sql.Driver {
+            		static {
+                    try {
                         // static 절에서 Driver를 생성하고 DriverManager에 등록한다. 
                         java.sql.DriverManager.registerDriver(new Driver());
-                     } catch (SQLException E) {
-                         throw new RuntimeException("Can't register driver!");
-                     }
-                 }
-             
-             
-                 [...]
+                    } catch (SQLException E) {
+                      	throw new RuntimeException("Can't register driver!");
+                    }
+            		}
+              
+                 ...
              }
             ```
-
-          - 자바 1.6 이상부터는 서비스로더 기반으로 JDBC Driver가 자동으로 등록된다.
-
-            그래서 Class.forName("com.mysql.jdbc.Driver") 류의 코드를 호출하지 않아도 된다.
-
-  - 브릿지 패턴을 통해 서비스 접근 API는 공급자가 제공하는 것보다 더 풍부한 서비스 인터페이스를 클라이언트에 반환할 수 있다.
+            
+- 자바 1.6 이상부터는 서비스로더 기반으로 JDBC Driver가 자동으로 등록된다.
+          
+  그래서 Class.forName("com.mysql.jdbc.Driver") 류의 코드를 호출하지 않아도 된다.
+    
+- 브릿지 패턴을 통해 서비스 접근 API는 공급자가 제공하는 것보다 더 풍부한 서비스 인터페이스를 클라이언트에 반환할 수 있다.
 
 
 
