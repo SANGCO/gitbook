@@ -1027,15 +1027,94 @@
 
 ### 6.2 커피 전문점 마이크로서비스 아키텍처 구축
 
+
+
 #### 설정 서버
+
+- `@EnableConfigServer`
+  - `application.yml`에 참조할 'Git URL' 정보를 등록
+  - `http://localhost:8888/config-server/refresh`
+    - 이거 실행해서 갱신해주면 마이크로서비스의 재기동 없이 변경된 설정값이 반영
+    - `http://localhost:8888/config-server/dev`
+      - dev 설정 정보
+    - `http://localhost:8888/config-server/prod`
+      - prod 설정 정보
+
+
 
 #### 유레카 서버
 
+- 유레카 서버(Eureka server)는 마이크로서비스의 등록과 삭제에 대한 상태 정보를 동적으로 감지하는 역할을 수행한다.
+- 유레카 서버는 단일 서버(standalone server)로 독립적으로 구동하거나 복수 개의 서버로 다중화하여 구성할 수 있다.
+- 설정파일에 `defaultZone: http://localhost:${server.port}/eureka/`
+  - 마이크로서비스는 기동 시 자신의 상태 정보를 'defaultZone'에 선언된 유레카 서버에게 알려줍니다.
+- `@EnableEurekaServer`
+- `http://localhost:포트번호`
+  - 대시보드 뜬다.
+
+
+
 #### 줄 서버
+
+- 줄 서버(Zuul server)는 부하 분산 설정과 서비스 라우팅 기능을 수행합니다.
+  - 부하 분산은 동일한 서비스가 여러 서버에 배포되어 있을 때 부하를 분산시켜 주는 기능
+  - 서비스 라우팅은 줄 서버에서 설정한 컨텍스트 패스(context path)를 기준으로 마이크로서비스를 라우팅해 주는 역할
+- `@EnableZuulProxy`,  `@EnableEurekaClient`
+- 줄 서버에서 참조하는 `serviceId`는 마이크로서비스의 `application.yml`에서 지정한 `spring:application:name`이다.
+  - 마이크로서비스가 기동될 때 마이크로서비스의 애플리케이션 이름이 유레카 서버에 등록
+  - 각 마이크로서비스에 설치된 유레카 클라이언트를 사용해서 유레카 서버에 등록된 각 마이크로서비스의 애플리케이션 이름을 참조할 수 있다.
+
+```properties
+#Zuul Routing    
+zuul:
+  routes:
+    coffeeOrder: #routing id
+      path: /coffeeOrder/** #zuul context root
+      serviceId: msa-service-coffee-order #spring application name
+      
+    coffeeMember:
+      path: /coffeeMember/** 
+      serviceId: msa-service-coffee-member  
+      
+    coffeeStatus: 
+      path: /coffeeStatus/**
+      serviceId: msa-service-coffee-status
+```
+
+
 
 #### 터빈 서버
 
+- 터빈 서버는 각 마이크로서비스에서 생성되는 히스트릭스 클라이언트의 스트림 메시지를 터빈 서버로 모두 수집하는 역할을 한다.
+  - 메인 클래스에 `@EnableCircuitBreaker` 어노테이션이 있고 스트림 메시지를 보낼 REST API 함수에 `@HystrixCommand` 어노테이션
+    - 저 두 어노테이션이 붙은 REST API가 호출되면 해당 REST API함수와 관련된 스트림 메시지를 터비 서버가 수집해서 히스트릭스 대시보드에 전달하여 모니터링됩니다.
+- `@EnableTurbine`, `@EnableEurekaClient`
+
+
+
 #### 히스트릭스 대시보드 서버
+
+- 히스트릭스 대시보드(Hystrix Dashboard)는 히스트릭스 클라이언트에서 생성하는 스트림을 시각화하여 웹 화면에 보여 주는 대시보드 화면이다.
+  - 히스트릭스 대시보드는 터빈 서버에 연결하여 일괄 취합된 스트림 메시지를 웹 화면을 통해 확인할 수 있다.
+
+- `@EnableHystrixDashboard`, `@EnableEurekaClient`
+- `http://localhost:7070/hystrix`
+  - `http://localhost:9999/turbine.stream` 입력
+  - Monitor Stream 클릭
+
+- 히스트릭스 서킷 브레이커
+
+  - `@HystrixCommand(fallbackMethod = "fallbackFunction")`
+
+    - 해당 REST API 함수에 `Exception`이 발생하면 서킷 브레이커 설정에 따라서 `fallbackMethod`에 정의된 함수가 기능을 대체하게 된다.
+
+    - ```
+      public String fallbackFunction(){
+         return "fallbackFunction()";
+      }
+      ```
+
+
 
 ## CHAPTER 07 마이크로서비스 빌드 배포
 
