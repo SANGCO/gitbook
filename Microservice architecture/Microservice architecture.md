@@ -1039,6 +1039,9 @@
       - dev 설정 정보
     - `http://localhost:8888/config-server/prod`
       - prod 설정 정보
+  - `org.springframework.cloud:spring-cloud-config-server`
+    - `org.springframework.cloud:spring-cloud-starter-config`
+      - config 서버 사용하는 client 서버에
 
 
 
@@ -1140,3 +1143,20 @@ zuul:
 
 
 
+## APPENDIX 커피 전문점 서비스 요약 및 실행
+
+### A.1 커피 전문점 시비스 개요
+
+### A.2 커피 전문점 시비스 및 에코시스템 기동
+
+#### 테스트 테이블 및 데이터 생성
+
+- 회원 확인 마이크로서비스 포트는 8081
+  - `localhost:8081/console`
+    - h2 콘솔 접속
+  - `jdbc:h2:mem:testdb`
+    - 이 주소로 해서 접속
+- 주문 처리 상태 확인 마이크로서비스는 포트가 8082
+  - `localhost:8081/console`
+    - 이 주소로 접속해서 따로 또 확인해야 한다.
+    - 마이크로서비스 DB도 분리

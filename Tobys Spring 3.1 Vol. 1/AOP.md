@@ -299,6 +299,24 @@ public class HelloUppercase implements Hello {
     - Hello 인터페이스의 메소드가 아무리 많더라도 invoke() 메소드 하나로 처리할 수 있다.
 
 ```java
+// 리스트 6-23 InvocationHandler 구현 클래스
+public class UppercaseHandler implements InvocationHandler {
+  	Hello target;
+  
+  	public UppercaseHandler(Hello target) {
+      	this.target = target;
+    }
+  
+  	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+      	// 타깃으로 위임. 인터페이스의 메소드 호출에 모두 적용된다.
+      	String ret = (String)method.invoke(target, args);
+      	return ret.toUpperCase(); // 부가기능 제공
+    }
+}
+```
+
+```java
+// 리스트 6-24 프록시 생성
 Hello proxiedHello = (Hello) Proxy.newProxyInstance(
 		    getClass().getClassLoader(),
   			new Class[] { Hello.class },
@@ -315,6 +333,74 @@ Hello proxiedHello = (Hello) Proxy.newProxyInstance(
   - 오브젝트의 메소드 호출 후 리턴 타입을 확인해서 리턴 타입이 스트링인 경우만 대문자로 바꿔줄 수 있다. 
   - 어떤 종류의 인터페이스를 구현한 타깃이든 상관없이 재사용할 수 있다.
     - target의 타입을 Object로
+
+
+
+- JAVA Proxy 예제 만든거 참고
+
+```java
+public interface Multiply {
+
+    int twice(int x);
+
+    int treble(int x);
+
+}
+```
+
+```java
+public class MultiplyImpl implements Multiply {
+
+    @Override
+    public int twice(int x) {
+        return x * 2;
+    }
+
+    @Override
+    public int treble(int x) {
+        return x * 3;
+    }
+}
+```
+
+```java
+public class JavaProxyHandler implements InvocationHandler {
+
+    private Object target;
+
+    public JavaProxyHandler(Object target) {
+        this.target = target;
+    }
+
+    @Override
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        System.out.println("메소드 시작");
+        int result = (int) method.invoke(target, args);
+        System.out.println("메소드 끝");
+        return result;
+    }
+}
+```
+
+```java
+public class Main {
+
+    public static void main(String[] args) {
+        Multiply twice = new MultiplyImpl();
+        Class<? extends Multiply> twiceClass = twice.getClass();
+        Multiply proxyInstance = (Multiply) Proxy.newProxyInstance(
+            twiceClass.getClassLoader(),
+            twiceClass.getInterfaces(),
+            new JavaProxyHandler(twice)
+        );
+      	// twice()와 treble()이 호출 될 때마다 JavaProxyHandler의 invoke()가 호출된다.
+      	// invoke() 메소드의 파라미터 Method에 호출하는 메소드의 정보가 들어있다.
+        System.out.println(proxyInstance.twice(5));
+        System.out.println(proxyInstance.treble(5));
+    }
+
+}
+```
 
 
 
@@ -529,6 +615,37 @@ static class UppercaseAdvice implements MethodInterceptor {
 
 #### 스프링 XML 설정파일
 
+```xml
+<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />  
+</bean>
+
+<bean id="transactionAdvice" class="springbook.user.service.TransactionAdvice">
+		<property name="transactionManager" ref="transactionManager" />
+</bean>
+
+<bean id="transactionPointcut" class="org.springframework.aop.support.NameMatchMethodPointcut">
+		<property name="mappedName" value="upgrade*" />
+</bean>
+
+<bean id="transactionAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+		<property name="advice" ref="transactionAdvice" />
+		<property name="pointcut" ref="transactionPointcut" />
+</bean>
+
+<!--  application components -->
+
+<bean id="userService" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target" ref="userServiceImpl" />
+		<property name="interceptorNames">
+				<list>
+						<value>transactionAdvisor</value>
+				</list>
+		</property>
+</bean>
+```
+
+
 
 
 #### 테스트
@@ -539,8 +656,8 @@ static class UppercaseAdvice implements MethodInterceptor {
 
 - ProxyFactoryBean은 스프링의 DI와 템플릿/콜백 패턴, 서비스 추상화 등의 기법이 모두 적용된 것이다.
   - 그 덕분에 독립적이며, 여러 프록시가 공유할 수 있는 어드바이스와 포인트컷으로 확장 기능을 분리할 수 있었다.
-
 - `그림 6-19` ProxyFactoryBean, Advice, Pointcut을 적용한 구조
+  - 그림 보면 더 헤깔리네. 위에 XML 파일을 보자.
 
 
 

@@ -362,6 +362,9 @@ public class StringCalculator {
 
 ### 7.3 동영상을 활용한 DAO 리팩토링 실습
 
+- 템플릿의 abstract 메소드를 인터페이스로 빼서 파라미터로 돌리는 부분 체크
+- 순수 JDBC에서 JdbcTemplate을 도출하는 과정 체크
+
 
 
 ### 7.4 DAO 리팩토링 및 설명
