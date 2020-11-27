@@ -123,6 +123,8 @@ public abstract class EnumSet<E extends Enum<E>>
       - 이 컴포넌트는 서비스 인터페이스의 인스턴스를 생성하는 팩터리 객체를 설명해준다.
       - 서비스 제공자 인터페이스가 없으면 서비스 인터페이스의 구현체를 만들 때 리플렉션을 사용해야한다.
 
+  - 브릿지 패턴을 통해 서비스 접근 API는 공급자가 제공하는 것보다 더 풍부한 서비스 인터페이스를 클라이언트에 반환할 수 있다.
+
   - JDBC (Java **D**ata**b**ase Connectivity)가 대표적인 서비스 제공자 프레임워크
 
     - `Driver`는 서비스 인터페이스 역할을, `DriverManager.registerDriver`가 제공자 등록 API 역할, `DriverManager.getConnection`이 서비스 접근 API 역할을 수행한다.
@@ -140,7 +142,9 @@ public abstract class EnumSet<E extends Enum<E>>
           - Class.forName("package.ClassName")를 실행하는 경우 문자열로 전달되는 클래스가(ex. com.mysql.jdbc.Driver) 존재하는 클래스를 메모리에 로드하는 역할
 
           - Driver 클래스가 메모리에 로드되면서 static 절이 실행된다.
-
+  
+            - 그래서 Driver 클래스만 Class.forName으로 로드 했을 뿐인데 DriverManager는 특정 DB의 드라이버가 있다는 걸 알고 Connection을 맺을 수 있다.
+            
             ```java
             public class Driver extends NonRegisteringDriver implements java.sql.Driver {
             		static {
@@ -155,12 +159,87 @@ public abstract class EnumSet<E extends Enum<E>>
                  ...
              }
             ```
-            
+  
 - 자바 1.6 이상부터는 서비스로더 기반으로 JDBC Driver가 자동으로 등록된다.
-          
-  그래서 Class.forName("com.mysql.jdbc.Driver") 류의 코드를 호출하지 않아도 된다.
+
+  - 그래서 Class.forName("com.mysql.jdbc.Driver") 류의 코드를 호출하지 않아도 된다.
+    - 내부에 까보니 ServiceLoader 클래스도 사용하고 Class.forName()도 호출하고 있구만.
+
+- ServiceLoader
+
+  - Java6에서 지정된 인터페이스와 일치하는 구현을 검색하고 로드하는 일을 하는 SPI(Service Provider Interface)가 도입됨.
+
+  - SPI는 제 3자가 구현하거나 확장하기 위한 API.
+
+  - JDBC Driver의 경우 SPI에 정의된 인터페이스를 보고 DB 벤더들이 구현해서 제공.
+
+  - ServiceLoader 클래스는 SPI의 핵심 클래스로서 서비스 구현을 로드함.
+
+  - [Java Service Provider Interface](https://www.baeldung.com/java-spi)
+
+```java
+public class DriverManager {
+
+  	...
+  
+    static {
+        loadInitialDrivers();
+        println("JDBC DriverManager initialized");
+    }
+
+  	...
+  	
+    private static void loadInitialDrivers() {
+        String drivers;
+        try {
+            drivers = AccessController.doPrivileged(new PrivilegedAction<String>() {
+                public String run() {
+                    return System.getProperty("jdbc.drivers");
+                }
+            });
+        } catch (Exception ex) {
+            drivers = null;
+        }
     
-- 브릿지 패턴을 통해 서비스 접근 API는 공급자가 제공하는 것보다 더 풍부한 서비스 인터페이스를 클라이언트에 반환할 수 있다.
+        AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
+    
+                ServiceLoader<Driver> loadedDrivers = ServiceLoader.load(Driver.class);
+                Iterator<Driver> driversIterator = loadedDrivers.iterator();
+ 
+                try{
+                    while(driversIterator.hasNext()) {
+                        driversIterator.next();
+                    }
+                } catch(Throwable t) {
+                    // Do nothing
+                }
+                return null;
+            }
+        });
+    
+        println("DriverManager.initialize: jdbc.drivers = " + drivers);
+    
+        if (drivers == null || drivers.equals("")) {
+            return;
+        }
+        String[] driversList = drivers.split(":");
+        println("number of Drivers:" + driversList.length);
+        for (String aDriver : driversList) {
+            try {
+                println("DriverManager.Initialize: loading " + aDriver);
+              	// Class.forName() 호출하고 있네.
+                Class.forName(aDriver, true, ClassLoader.getSystemClassLoader());
+            } catch (Exception ex) {
+                println("DriverManager.Initialize: load failed: " + ex);
+            }
+        }
+    }
+  
+  	...
+    
+}
+```
 
 
 
