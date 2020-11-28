@@ -55,10 +55,58 @@
           - 전형적인 오브젝트 어댑터 패턴을 사용
           - 특정 컨트롤러를 호출해야 할 때는 컨트롤러 타입을 지원하는 어댑터를 중간에 껴서 호출
           - 오케이 이제 **핸들러 어댑터**라는 용어가 자연스럽게 이해가 된다.
+  - (3) 컨트롤러의 모델 생성과 정보 등록
+    - MVC 패턴의 장점
+      - 정보를 담고 있는 모델과 정보를 어떻게 뿌려줄지를 알고 있는 뷰가 분리된다는 점
+    - 컨트롤러의 작업을 네 가지로 분류
+      - 사용자 요청을 해석
+      - 실제 비즈니스 로직을 수행하도록 서비스 계층 오브젝트에게 작업을 위임
+      - 결과를 받아서 모델을 생성
+      - 어떤 뷰를 사용할지 결정
+    - 컨트롤러가 어떤 식으로든 다시 DispatcherServlet에 돌려줘야 할 두 가지 정보
+      - 모델과 뷰
+  - (4) 컨트롤러의 결과 리턴: 모델과 뷰
+    - ModelAndView
+      - DispatcherServlet이 최종적으로 어댑터를 통해 컨트롤러로부터 돌려받는 오브젝트
+      - 이름 그대로 모델과 뷰, 두 가지 정보를 담고 있다.
+  - (5) DispatcherServlet의 뷰 호출과 (6) 모델 참조
+    - 기술적으로 보면 뷰 작업을 통한 최종 결과물은 HttpServletResponse 오브젝트 안에 담긴다.
+  - (7) HTTP 응답 돌려주기
+    - DispatcherServlet 후처리기 있는지 확인
+      - 있으면 후처리기 작업 진행
+      - 없으면 뷰가 만들어준 HttpServletResponse에 담긴 최종 결과를 서블릿 컨테이너에게 돌려준다.
+      - 서블릿 컨테이너는 HttpServletResponse에 담긴 정보를 HTTP 응답으로 만들어 사용자의 브라우저나 클라이언트에게 전송하고 작업을 종료
 
 
 
 - DispatcherServlet의 DI 가능한 전략
+  - DispatcherServlet에는 다양한 방식으로 DispatcherServlet의 동작방식과 기능을 확장, 변경할 수 있는 전략들이 존재한다.
+    - 상세한 사용 방법은 뒤에서 하나씩 알아본다.
+    - 여기서는 어떤 종류의 전략이 있는지 간단히 살펴보자.
+  - HandlerMapping
+    - 핸들러 매핑은 URL과 요청 정보를 기준으로 어떤 핸들러 오브젝트, 즉 컨트롤러를 사용할 것인지를 결정하는 로직을 담당한다.
+    - DispatcherServlet은 하나 이상의 핸들러 매핑을 가질 수 있다.
+    - 디폴트는 BeanNameUrlHandlerMapping, DefaultAnnotationHandlerMapping
+  - HandlerAdapter
+    - 핸들러 어댑터는 핸들러 매핑으로 선택한 컨트롤러/핸들러를 DispatcherServlet이 호출할 때 사용하는 어댑터다.
+    - 디폴트는 HttpRequestHandlerAdapter, SimpleControllerHandlerAdapter, AnnotationMethodHandlerAdapter
+    - 핸들러 매핑과 어댑터는 서로 관련이 있을 수도 있고 없을 수도 있다.
+      - A1 어댑터로 호출 할 수 있는 컨트롤러를 M1, M2, M3 세 가지 핸들러 매핑을 이용해서 찾을 수 있다.
+      - M1 핸들러 매핑으로 발견한 컨틀롤러를 A1, A2, A3 세 가지 종류의 어댑터를 통해 호출할 수 있다.
+      - 핸들러 매핑과 어댑터가 한 가지 컨트롤러에만 적용되는 특별한 경우도 있다.
+  - HandlerExceptionResolver
+    - 예외가 발생했을 때 이를 처리하는 로직을 가지고 있다.
+    - 발생한 예외에 적합한 HandlerExceptionResolver를 찾아서 예외처리를 위임
+    - 디폴트는 AnnotationMethodHandlerExceptionResolver, ResponseStatusHandlerExceptionResolver, DefaultHandlerExceptionResolver 세 가지가 등록되어 있다.
+  - ViewResolver
+    - 컨트롤러가 리턴한 뷰 이름을 참고해서 적적한 뷰 오브젝트를 찾아주는 로직을 가진 전략 오브젝트
+    - 뷰의 종류에 따라 적절한 뷰 리졸버를 추가로 설정해줄 수 있다.
+  - LocaleResolver
+    - 지역 정보를 결정해주는 전략
+    - 디폴트인 AcceptHeaderLocaleResolver는 HTTP 헤더의 정보를 보고 지역정보를 설정
+    - 전략을 바꾸면 지역정보를 세션, URL 파라미터, 쿠키, XML 설정에 직접 지정한 값 등 다양한 방식으로 결정 할 수 있다.
+  - ThemeResolver
+  - RequestToViewNameTranslator
 
 
 
