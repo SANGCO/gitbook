@@ -169,7 +169,7 @@ public abstract class EnumSet<E extends Enum<E>>
 
   - Java6에서 지정된 인터페이스와 일치하는 구현을 검색하고 로드하는 일을 하는 SPI(Service Provider Interface)가 도입됨.
 
-  - SPI는 제 3자가 구현하거나 확장하기 위한 API.
+  - SPI는 제 3자가 구현하거나 확장하기 위한 API.ㅌ   
 
   - JDBC Driver의 경우 SPI에 정의된 인터페이스를 보고 DB 벤더들이 구현해서 제공.
 
@@ -339,7 +339,7 @@ public class NutritionFacts {
   - **불변(immutable 혹은 immutability)**은 어떠한 변경도 허용하지 않는다는 뜻
     - 대표적으로 `String` 객체는 한번 만들어지면 절대 값을 바꿀 수 없는 불변 객체다.
   - **불변식(invariant)**은 프로그램이 실행되는 동안, 혹은 정해진 기간 동안 반드시 만족해야 하는 조건을 말한다.
-    - 기간을 표현하는 `Period` 클래스에서 start 필드의 값은 반드시 end 필드의 값보다 앞서야 하므로, 두 값이 역전되면 역시 불변식이 깨진 것이다(아이템 50 참조).
+    - 기간을 표현하는 `Period` 클래스에서 start 필드의 값은 반드시 end 필드의 값보다 앞서야 하므로, 두 값이 역전되면 역시 불변식이 깨진 것이다(아이템 50 참조). 
   - 가변 객체에도 불변식은 존재할 수 있으며, 넓게 보면 불변은 불변식의 극단적인 예라 할 수 있다.
 
 ```java
