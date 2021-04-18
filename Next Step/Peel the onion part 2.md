@@ -1,18 +1,69 @@
+
+
 ## 9장 두 번째 양파 껍질을 벗기기 위한 중간 점검
+
+
 
 ### 9.1 자체 점검 요구사항(필수)
 
+
+
 ### 9.2 자체 점검 요구사항(선택)
 
+
+
 ### 9.3 자체 점검 확인
+
+
 
 ## 10장 새로운 MVC 프레임워크 구현을 통한 점진적 개선
 
 ### 10.1 MVC 프레임워크 요구사항 3단계
 
+
+
 ### 10.2 MVC 프레임워크 구현 3단계
 
+- WebApplicationInitializer를 구현한 클래스를 만들어두면 웹 애플리케이션이 시작될 때 onStartup() 메소드가 자동으로 실행된다. 이때 메소드 파라미터로 ServletContext 오브젝트가 전달되는데, 이를 이용해 필요한 컨텍스트 등록 작업을 수행하면 된다.
+
+- MyWebApplicationInitializer
+
+  - AnnotationHandlerMapping 초기화
+
+    - @Controller 어노테이션 붙인 클래스 가지고 온다.
+
+    - 거기서 @RequestMapping 어노테이션 붙인 메소드 가지고 온다.
+
+    - ```java
+      // 여기에 HandlerKey, HandlerExecution 생성해서 넣어준다.
+      Map<HandlerKey, HandlerExecution> handlerExecutions = Maps.newHashMap();
+      ```
+
+      - HandlerKey
+        - URL, RequestMethod
+        - 초기화 할 때는 @RequestMapping 어노테이션의 value(), method()에서 정보를 가지고 와서 만든다.
+        - 요청이 들어오면 Request에서 URL과 HTTP 메소드를 꺼내서 HandlerKey를 만든다.
+      - HandlerExecution
+        - Object, Method
+        - handle() 메소드를 호출하면 메소드를 실행시켜 준다.
+
+  - ServletContext에 DispatcherServlet 등록
+
+- DispatcherServlet
+
+  - 요청이 들어오면 service() 메소드가 호출된다.
+  - getHandler()
+    - HandlerExecution 리턴
+  - execute() 
+    - 여러 개의 프레임워크 컨트롤러를 추상화한 HandlerAdapter 타입이 HandlerExecution을 실행 시킨다.
+
+
+
 ### 10.3 인터페이스가 다른 경우 확장성 있는 설계
+
+
+
+
 
 ### 10.4 배포 자동화를 위한 쉘 스크립트 개선
 

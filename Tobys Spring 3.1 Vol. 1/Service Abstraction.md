@@ -345,11 +345,14 @@ public void upgradeLevels() {
 
 - 트랜잭션 추상화 API를 적용한 UserService 코드
   - JTA를 이용하는 글로벌 트랜잭션으로 변경
-    - `PlatformTransactionManager txManager =
-            	new JTATransactionManager()();`
+    
+    - ```java
+      PlatformTransactionManager txManager = new JTATransactionManager();
+      ```
   - 하이버네이트로 UserDao를 구현했다면 HibernateTransactionManager를 사용
   - JPA를 적용했다면 JPATransactionManager를 사용
   - 어떤 트랜잭션 매니저 구현 클래스를 사용할지 UserService 코드가 알고 있는 것은 DI 원칙에 위배
+    
     - 자신이 사용할 구체적인 클래스를 스스로 결정하고 생성하지말고 컨테이너를 통해 외부에서 제공받게 하는 스프링 DI의 방식으로 변경
 - 어떤 클래스든 스프링의 빈으로 등록할 때 먼저 검토 해야 할 것
   - 싱글톤으로 만들어져 여러 스레드에서 동시에 사용해도 괜찮은가

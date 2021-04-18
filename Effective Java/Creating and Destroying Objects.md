@@ -35,7 +35,13 @@ public static BigInteger probablePrime(int bitLength, Random rnd) {
 
 - **캐싱**하여 재활용하는 식으로 불필요한 객체 생성을 피할 수 있다.
 - 플라이웨이트 패턴도 이와 비슷한 기법
-  - 9p 인스턴스 통제, 싱글톤, 인스턴스화 불가 부분은 다시 체크하자.
+- 인스턴스 통제(instance-controlled) 클래스
+  - 정적 팩토리 메서드를 사용해서 캐싱한 객체를 반환하게 하면 언제 어느 인스턴스를 살아 있게 할지를 철저히 통제할 수 있는데 이런 클래스를 인스턴스 통제 클래스라고 한다.
+  - 인스턴스를 통제하는 이유는?
+    - 싱글턴(singleton; 아이템 3)으로 만들 수 있다.
+    - 인스턴스화 불가(noninstantiable; 아이템 4)로 만들 수 있다.
+    - 불변 값 클래스(아이템 17)에서 동치인 인스턴스가 단 하나뿐임을 보장할 수 있다.
+      - 코드 17-2 생성자 대신 정적 팩터리를 사용한 불변 클래스
 
 ```java
 public static final Boolean TRUE = new Boolean(true);
@@ -52,7 +58,7 @@ public static Boolean valueOf(boolean b) {
 
 - 이 능력은 반환할 객체의 클래스를 자유롭게 선택할 수 있게 하는 '**엄청난 유연성**'을 선물한다.
 - API를 만들 때 이 유연성을 응용하면 구현 클래스를 공개하지 않고도 그 객체를 반환할 수 있어 API를 작게 유지할 수 있다.
-- 자바 8 전에는 인터페이스에 정적 메서드를 선언할 수 없어서 이름이 "Type"인 인터페이스를 반환하는 정적 메서드가 필요하면, "Type**s**"라는 (인스턴스화 불가인) 동반 클래스를 만들어 그 안에 정의하는 것이 관례였단다.
+- 자바 8 이전에는 인터페이스에 정적 메서드를 선언할 수 없어서 이름이 "Type"인 인터페이스를 반환하는 정적 메서드가 필요하면, "Type**s**"라는 (인스턴스화 불가인) 동반 클래스를 만들어 그 안에 정의하는 것이 관례였단다.
   - `java.util.Collection`, `java.util.Collections`
     - Collection 인터페이스에 정적 메서드를 선언할 수 없었어서 나온 동반 클래스(companion class)가 Collections 클래스 이구나.
     - 핵심 인터페이스들에 수정 불가나 동기화 등의 기능을 덧붙인 총 45개의 유틸리티 구현체를 제공 한단다.
@@ -169,7 +175,7 @@ public abstract class EnumSet<E extends Enum<E>>
 
   - Java6에서 지정된 인터페이스와 일치하는 구현을 검색하고 로드하는 일을 하는 SPI(Service Provider Interface)가 도입됨.
 
-  - SPI는 제 3자가 구현하거나 확장하기 위한 API.ㅌ   
+  - SPI는 제 3자가 구현하거나 확장하기 위한 API.
 
   - JDBC Driver의 경우 SPI에 정의된 인터페이스를 보고 DB 벤더들이 구현해서 제공.
 
@@ -404,10 +410,12 @@ public abstract class Pizza {
             return self();
         }
 
+      	// 외부에서 호출할 수 있게 접근 제한자가 public이 되야겠지.
         abstract Pizza build();
 
         // 하위 클래스는 이 메서드를 재정의(overriding)하여
         // "this"를 반환하도록 해야 한다.
+        // self() 호출은 여기서 구현체는 하위 클래스에, 그래서 접근 제한자가 protected
         protected abstract T self();
     }
     
@@ -484,7 +492,7 @@ public class Calzone extends Pizza {
 // 계층적 빌더 사용
 public class PizzaTest {
     public static void main(String[] args) {
-        // 정적 중첩 클래스 객체 생성 방법 
+        // 정적 중첩 클래스 객체 생성 방법 (.Inner()가 생성자임)
       	// Outer.Inner inner = new Outer.Inner();
       	// addTopping()은 self() 반환
         // sauceInside()는 this 반환
@@ -547,7 +555,7 @@ public class PizzaTest {
 ### public static final 필드 방식의 싱글턴
 
 - `private` 생성자는 `public static final` 필드인 Elvis 타입 INSTANCE 필드를 초기화 할 때 딱 한 번만 호출된다.
-  - 예외는 단 한가지, 권한이 있는 클라이언트는 리플렉션 API(아이템 65)인 AccessibleObject.setAccessible을 사용해 private 생성자를 호출할 수 있다.
+  - 예외는 단 한가지, 권한이 있는 클라이언트는 리플렉션 API(아이템 65)인 `AccessibleObject.setAccessible`을 사용해 private 생성자를 호출할 수 있다.
 - 장점
   - 해당 클래스가 싱클턴임이 API에 명백히 들어난다.
   - 간결하다.
@@ -577,7 +585,7 @@ public class Elvis {
 
 - 장점
   - API를 바꾸지 않고도 싱글턴이 아니게 변경할 수 있다는 점
-  - 정적 팩터리를 제네릭 싱글턴 팩터리로 만들 수 있다는 점이다(아이템 30).
+  - 정적 팩터리를 제네릭 싱글턴 팩터리로 만들 수 있다는 점(아이템 30)
   - 정적 팩터리의 메서드 참조를 공급자(supplier)로 사용할 수 있다는 점
     - `Elvis::getInstancce`를 `Supplier<Elvis>`로 사용할 수도 있다.
 
@@ -640,7 +648,7 @@ public enum Elvis {
 - 이따금 단순히 정적 메서드와 정적 필드만을 담은 클래스를 만들고 싶을 때가 있을 것이다.
   - `java.lang.Math`와 `java.util.Arrays`처럼 기본 타입 값이나 배열 관련 메서드들을 모아놓을 수 있다.
   - `java.util.Collections`처럼 특정 인터페이스를 구현하는 객체를 생성해주는 정적 메서드(혹은 팩터리)를 모아놓을 수도 있다(자바 8부터는 이런 메서드를 인터페이스에 넣을 수 있다).
-  - `final` 클래스와 관련한 메서들을 모아놓을 때도 사용한다. 
+  - `final` 클래스와 관련한 메서들을 모아놓을 때도 사용한다.
     - `final` 클래스를 상속해서 하위 클래스에 메서드를 넣는건 불가능하기 때문이다.
 - 정적 멤버만 담은 유틸리티 클래스는 인스턴스로 만들어 쓰려고 설계한게 아니다. 하지만 생성자를 명시하지 않으면 컴파일러가 자동으로 기본 생성자를 만들어준다.
   - 실제로 공개된 API들에서도 이처럼 의도치 않게 인스턴스화할 수 있게 된 클래스가 종종 목격되곤 한다.
@@ -674,8 +682,15 @@ public class UtilityClass {
 
 
 
-- 사용하는 자원에 따라 동작이 달라지는 클래스에는 정적 유틸리티 클래스나 싱글턴 방식이 적합하지 않다.
-- 이 조건을 만족하는 간단한 패턴이 있으니, 바로 인스턴스를 생성할 때 생성자에 필요한 자원을 넘겨주는 방식이다.
+- 사용하는 자원에 따라 동작이 달라지는 클래스
+  - 맞춤법 검사기는 사전에 의존
+    - 사전이 달라지면 동작이 달라지겠지?
+  - 잘못 사용한 예
+    - 정적 유틸리티
+      - 생성자 `private`으로 만들고 `isValid()`, `suggestions()`  메서드는 `static`으로
+    - 싱글턴
+
+- 인스턴스를 생성할 때 생성자에 필요한 자원을 넘겨주는 방식
   - 이 패턴의 쓸만한 변형으로, 생성자에 자원 팩터리를 넘겨주는 방식이 있다.
   - 팩터리란 호출할 때마다 특정 타입의 인스턴스를 반복해서 만들어주는 객체를 말한다.
     - 팩터리 메서드 패턴을 구현

@@ -28,11 +28,15 @@
 
 
 
+#### 스프링 웹 프레임워크
 
 
-스프링 웹 프레임워크
-스프링 포트폴리오 웹 프레임워크
-스프링을 기반으로 두지 않는 웹 프레임워크
+
+#### 스프링 포트폴리오 웹 프레임워크
+
+
+
+#### 스프링을 기반으로 두지 않는 웹 프레임워크
 
 
 
@@ -88,7 +92,7 @@
     - DispatcherServlet은 하나 이상의 핸들러 매핑을 가질 수 있다.
     - 디폴트는 BeanNameUrlHandlerMapping, DefaultAnnotationHandlerMapping
   - HandlerAdapter
-    - 핸들러 어댑터는 핸들러 매핑으로 선택한 컨트롤러/핸들러를 DispatcherServlet이 호출할 때 사용하는 어댑터다.
+    - 핸들러 어댑터는 핸들러 매핑으로 선택한 컨트롤러(핸들러)를 DispatcherServlet이 호출할 때 사용하는 어댑터다.
     - 디폴트는 HttpRequestHandlerAdapter, SimpleControllerHandlerAdapter, AnnotationMethodHandlerAdapter
     - 핸들러 매핑과 어댑터는 서로 관련이 있을 수도 있고 없을 수도 있다.
       - A1 어댑터로 호출 할 수 있는 컨트롤러를 M1, M2, M3 세 가지 핸들러 매핑을 이용해서 찾을 수 있다.
@@ -113,11 +117,18 @@
 
 ## 3.2 스프링 웹 애플리케이션 환경 구성
 
-3.2.1 간단한 스프링 웹 프로젝트 생성
+
+
+### 3.2.1 간단한 스프링 웹 프로젝트 생성
+
 루트 웹 애플리케이션 컨텍스트
 서블릿 웹 애플리케이션 컨텍스트 등록
 스프링 웹 프로젝트 검증
-3.2.2 스프링 웹 학습 테스트
+
+
+
+### 3.2.2 스프링 웹 학습 테스트
+
 서블릿 테스트용 목 오브젝트
 테스트를 위한 DispatcherServlet 확장
 ConfigurableDispatcherServlet을 이용한 스프링 MVC 테스트
@@ -129,30 +140,49 @@ ConfigurableDispatcherServlet을 이용한 스프링 MVC 테스트
 
 
 
-3.3.1 컨트롤러의 종류와 핸들러 어댑터
+### 3.3.1 컨트롤러의 종류와 핸들러 어댑터
+
 Servlet과 SimpleServletHandlerAdapter
 HttpRequestHandler와 HttpRequestHandlerAdapter
 Controller와 SimpleControllerHandlerAdapter
 AnnotationMethodHandlerAdapter
-3.3.2 핸들러 매핑
+
+
+
+- Adapter로 한번더 추상화를 해서 DispatcherServlet은 handle()만 호출하면 된다.
+
+
+
+### 3.3.2 핸들러 매핑
+
 BeanNameUrlHandlerMapping
 ControllerBeanNameHandlerMapping
 ControllerClassNameHandlerMapping
 SimpleUrlHandlerMapping
 DefaultAnnotationHandlerMapping
 기타 공통 설정정보
-3.3.3 핸들러 인터셉터
+
+
+
+### 3.3.3 핸들러 인터셉터
+
 HandlerInterceptor
 핸들러 인터셉터 적용
-3.3.4 컨트롤러 확장
+
+
+
+### 3.3.4 컨트롤러 확장
+
 커스텀 컨트롤러 인터페이스와 핸들러 어댑터 개발
+
 
 
 ## 3.4 뷰
 
 
 
-3.4.1 뷰
+### 3.4.1 뷰
+
 InternalResourceView와 JstlView
 RedirectView
 VelocityView, FreeMarkerView
@@ -161,24 +191,71 @@ AbstractExcelView, AbstractJExcelView, AbstractPdfView
 AbstractAtomFeedView, AbstractRssFeedView
 XsltView, TilesView, AbstractJasperReportsView
 MappingJacksonJsonView
-3.4.2 뷰 리졸버
-InternalResourceViewResolver
-VelocityViewResolver, FreeMarkerViewResolver
-ResourceBundleViewResolver, XmlViewResolver, BeanNameViewResolver
-ContentNegotiatingViewResolver
+
+
+
+### 3.4.2 뷰 리졸버
+
+
+
+#### InternalResourceViewResolver
+
+- 뷰 리졸버
+  - 뷰 이름으로부터 사용할 뷰 오브젝트를 찾아준다.
+- 핸들러 매핑
+  - URL로부터 컨트롤를 찾아준다.
+- 자동 등록되는 디폴트 뷰 리졸버
+- 그냥 사용하려면 전체 경로를 다 적어줘야 한다.
+  - `/WEB-INF/view/hello.jsp`
+- 프로퍼티를 이용해서 앞뒤에 붙는 내용 생략 가능
+  - 그러면 직접 빈으로 등록해야한다.
+  - prefix, suffix
+  - 이렇게 해놓으면 뷰 템플릿 바뀌어도 컨트롤러는 수정할게 없어진다. 
+
+
+
+#### VelocityViewResolver, FreeMarkerViewResolver
+
+
+
+#### ResourceBundleViewResolver, XmlViewResolver, BeanNameViewResolver
+
+- `ResourceBundleViewResolver`는 독립적인 파일을 이용해 뷰를 자유롭게 매핑할 수 있다는 장점이 있다.
+  - 모든 뷰를 일일이 파일에 정의해야해서 불편하다.
+- `InternalResourceViewResolver`, `ResourceBundleViewResolver` 빈으로 등록하고 order 프로퍼티를 설정해서 우선순위 주기
+  - `DispatcherServlet`이 뷰 이름에 대응되는 뷰가 있는지 `ResourceBundleViewResolver` 먼저 확인하고 없다면 `InternalResourceViewResolver`를 확인한다.
+    - `InternalResourceViewResolver`의 order 프로퍼티에는 기본적으로 `Interger.MAX`
+
+
+
+#### ContentNegotiatingViewResolver
+
+
+
+
+
 
 
 ## 3.5 기타 전략
 
 
 
-3.5.1 핸들러 예외 리졸버
+### 3.5.1 핸들러 예외 리졸버
+
 AnnotationMethodHandlerExceptionResolver
 ResponseStatusExceptionResolver
 DefaultHandlerExceptionResolver
 SimpleMappingExceptionResolver
-3.5.2 지역정보 리졸버
-3.5.3 멀티파트 리졸버
+
+
+
+### 3.5.2 지역정보 리졸버
+
+
+
+
+
+### 3.5.3 멀티파트 리졸버
 
 - 멀티 파트 처리를 담당하는 다양한 구현으로 바꿀 수 있도록 설계되어 있다.
   - 현재는 아파치 `Commons`의 `FileUpload` 라이브러리를 사용하는 `CommonsMultipartResolver` 한 가지만 지원된다.
@@ -190,19 +267,20 @@ SimpleMappingExceptionResolver
 
 
 
-RequestToViewNameTranslator
-
-
-
 ## 3.6 스프링 3.1의 MVC
 
 
 
-3.6.1 플래시 맵 매니저 전략
+### 3.6.1 플래시 맵 매니저 전략
+
 플래시 맵
 플래시 맵 매니저
 플래시 맵 매니저 전략
-3.6.2 WebApplicationInitializer를 이용한 컨텍스트 등록
+
+
+
+### 3.6.2 WebApplicationInitializer를 이용한 컨텍스트 등록
+
 루트 웹 컨텍스트 등록
 서블릿 컨텍스트 등록
 

@@ -2,14 +2,14 @@
 
 # 아이템 78. 공유 중인 가변 데이터는 동기화해 사용하라
 
-> In summary, **when multiple threads share mutable data, each thread that reads or writes the data must perform synchronization.** In the absence of synchronization, there is no guarantee that one thread’s changes will be visible to another thread. The penalties for failing to synchronize shared mutable data are liveness and safety failures. These failures are among the most difficult to debug. They can be intermittent and timing-dependent, and program behavior can vary radically from one VM to another. If you need only inter-thread communication, and not mutual exclusion, the volatile modifier is an acceptable form of synchronization, but it can be tricky to use correctly.
+> In summary, when **multiple threads** share **mutable data**, each thread that reads or writes the data must **perform synchronization**. In the absence of synchronization, there is no guarantee that one thread’s changes will be visible to another thread. The penalties for failing to synchronize **shared mutable data** are **liveness** and **safety failures**. These failures are among the most difficult to debug. They can be **intermittent** and **timing-dependent**, and program behavior can vary radically from one VM to another. If you need only **inter-thread communication**, and **not mutual exclusion**, the volatile modifier is an acceptable form of synchronization, but it can be tricky to use correctly.
 
 > **여러 스레드가 가변 데이터를 공유한다면 그 데이터를 읽고 쓰는 동작은 반드시 동기화 해야 한다.** 동기화하지 않으면 한 스레드가 수행한 변경을 다른 스레드가 보지 못할 수도 있다. 공유되는 가변 데이터를 동기화하는 데 실패하면 응답 불가 상태에 빠지거나 안전 실패로 이어질 수 있다. 이는 디버깅 난이도가 가장 높은 문제에 속한다. 간헐적이거나 특정 타이밍에만 발생할 수도 있고, VM에 따라 현상이 달라지기도 한다. 배타적 실행은 필요 없고 스레드끼리의 통신만 필요하다면 volatile 한정자만으로 동기화할 수 있다. 다만 올바로 사용하기가 까다롭다.
 
 
 
 - `synchronized` 키워드는 해당 메서드나 블록을 한번에 한 스레드씩 수행하도록 보장한다.
-- 배타적 실행
+- **배타적 실행**
   - 한 스레드가 변경 중이라 상태가 일관되지 않은 객체는 다른 스레드가 보지 못하게 막는다.
 - 동기화의 용도를 배타적 실행만으로 생각하면 안된다.
 - 메서드는 일관된 상태를 가지고 생성된 객체에 접근할 때 락을 건다.
@@ -20,8 +20,8 @@
   - 동기화는 일관성이 깨진 상태를 볼 수 없게 하는 것은 물론, 동기환된 메서드나 블록에 들어간 스레드가 같은 락의 보호하에 수행된 모든 이전 수정의 최종 결과를 보게 해준다.
 - 언어 명세상 `long`과 `double` 외의 변수를 읽고 쓰는 동작은 원자적(atomic)이다.
   - 여러 스레드가 같은 변수를 동기화 없이 수정하는 중이라도, 항상 어떤 스레드가 정상적으로 저장한 값을 온전히 읽어옴을 보장
-- 자바 언어 명세는 스레드가 필드를 읽을 때 항상 '수정이 완전히 반영된' 값을 얻는다고 보장
-  - 하지만 한 스레가 저장한 값이 다른 스레드에게 '보이는가'는 보장하지 않는다.
+- 자바 언어 명세는 스레드가 필드를 읽을 때 항상 **'수정이 완전히 반영된'** 값을 얻는다고 보장
+  - 하지만 한 스레가 저장한 값이 다른 스레드에게 **'보이는가'**는 보장하지 않는다.
   - '수정이 완전히 반영된' 값을 읽어오기는 하는데 그 값이 바로 직전에 다른 스레드가 저장한 값은 아닐 수도 있겠군. 사실 바로 직전에 저장한 값을 읽어와야 하는데 말이지.
 - 동기화는 배타적 실행뿐 아니라 스레드 사이의 안정적인 통신에 꼭 필요하다.
   - 이는 한 스레드가 만든 변화가 다른 스레드에게 언제 어떻게 보이는지를 규정한 자바의 메모리 모델 때문이다.

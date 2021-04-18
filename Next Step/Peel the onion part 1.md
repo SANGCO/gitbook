@@ -177,16 +177,10 @@ public class StringCalculator {
             - 인스턴스 생성
             - start 메소드 호출
     - `java.net.ServerSocket` 클래스
-      - 사용자 요청이 발생할 때까지 대기 상태에 있도록 ㅈ원하는 역할
+      - 사용자 요청이 발생할 때까지 대기 상태에 있도록 지원하는 역할
     - RequestHandler 클래스
       - `Thread`를 상속하고 있으며, 사용자의 요청에 대한 처리와 응답에 대한 처리를 담당하는 가장 중심이 되는 클래스
   - 프로그래밍을 할 때 좋은 습관 중의 하나는 프로그래밍 실행 중 발생하는 로그 메시지를 주의 깊게 살펴보는 것이다.
-
-
-
-새로운 쓰레드 생성하지 말고 쓰레드풀 사용하게 변경 해볼까나 
-
-마무리 하고 커밋
 
 
 
@@ -272,7 +266,7 @@ public class StringCalculator {
       - service()
       - destroy()
 - 자바 진영에서 웹 애플리케이션을 개발하면 컨테이너라는 용어를 접하게 된다. 
-  - 각 컨테이너마다 다른 기능을 지원하지만 기본적으로 컨테이너는 생명주기를 관리하는 기능을 제공한다.
+  - 각 컨테이너마다 다른 기능을 지원하지만 **기본적으로 컨테이너는 생명주기를 관리하는 기능을 제공**한다.
   - 스프링 프레임워크는 빈의 생명주기를 관리하는 기능을 제공한다.
   - 새로운 컨테이너를 학습할 기회가 있다면 서블릿 생명주기와 같은 방식으로 구현되어 있는지 확인해봐라.
     - 대부분 같은 방식으로 동작하기 때문에 새로운 컨테이너라도 좀 더 빠르게 학습할 수 있다.
@@ -315,7 +309,7 @@ public class StringCalculator {
 - RequestHandler에서 HttpRequest를 생성
   - HttpRequest가 클라이언트의 요청을 필드로 저장한다.
   - HttpRequest의 HttpHeaders에는 요청의 헤더 정보가 저장되어 있다.
-  - 쿠키나 세션 등 필요할 때 get하면 그때 new 해서 만들어서 리턴
+  - 쿠키나 세션 등 필요할 때 get하면 그때 new로 생성해서 리턴
 
 
 
@@ -414,6 +408,15 @@ public class StringCalculator {
 
 
 ### 8.4 MVC 프레임워크 구현 2단계
+
+- JSP와 JSON 뷰를 추상화한 Viw 인터페이스 추가
+  - render() 메소드
+    - Request와 Response를 인자로 받는다.
+  - 뷰가 다양해 져도 기존 코드에 수정할 부분이 없어졌다.
+- 뷰를 포함해 모델 데이터에 대한 추상화를 담당하는 ModelAndView 추가
+  - ModelAndView 생성을 좀 더 쉽도록 도와주는 AbstractController 추가
+    - jspView(), jsonView()
+  - 기존에는 데이터 이동은 request, response에 담아서
 
 
 
